@@ -6,6 +6,89 @@
       "type": "MeshQuad"
     }
   },
+  "Material|2021-10-14T11:54:28.588Z|09457": {
+    "ƒ.Material": {
+      "name": "Ground Material",
+      "idResource": "Material|2021-10-14T11:54:28.588Z|09457",
+      "shader": "ShaderUniColor",
+      "coat": {
+        "ƒ.CoatColored": {
+          "color": "[0.17647058823529413, 0.20392156862745098, 0.21176470588235294, 1]"
+        }
+      }
+    }
+  },
+  "MeshCube|2021-10-14T11:59:53.705Z|54043": {
+    "ƒ.MeshCube": {
+      "idResource": "MeshCube|2021-10-14T11:59:53.705Z|54043",
+      "name": "Border Mesh",
+      "type": "MeshCube"
+    }
+  },
+  "Material|2021-10-14T12:00:21.882Z|12479": {
+    "ƒ.Material": {
+      "name": "Border Material",
+      "idResource": "Material|2021-10-14T12:00:21.882Z|12479",
+      "shader": "ShaderUniColor",
+      "coat": {
+        "ƒ.CoatColored": {
+          "color": "[0, 0.7215686274509804, 0.5803921568627451, 1]"
+        }
+      }
+    }
+  },
+  "Material|2021-10-14T12:09:30.931Z|61067": {
+    "ƒ.Material": {
+      "name": "Agent Body Material",
+      "idResource": "Material|2021-10-14T12:09:30.931Z|61067",
+      "shader": "ShaderUniColor",
+      "coat": {
+        "ƒ.CoatColored": {
+          "color": "[0.03529411764705882, 0.5176470588235295, 0.8901960784313725, 1]"
+        }
+      }
+    }
+  },
+  "MeshSphere|2021-10-14T12:13:22.276Z|79559": {
+    "ƒ.MeshSphere": {
+      "idResource": "MeshSphere|2021-10-14T12:13:22.276Z|79559",
+      "name": "Laser Center",
+      "type": "MeshSphere",
+      "sectors": 8,
+      "stacks": 8
+    }
+  },
+  "Material|2021-10-14T12:13:32.371Z|72844": {
+    "ƒ.Material": {
+      "name": "Laser Center Material",
+      "idResource": "Material|2021-10-14T12:13:32.371Z|72844",
+      "shader": "ShaderUniColor",
+      "coat": {
+        "ƒ.CoatColored": {
+          "color": "[1, 0.4627450980392157, 0.4588235294117647, 1]"
+        }
+      }
+    }
+  },
+  "MeshCube|2021-10-14T12:14:21.526Z|84261": {
+    "ƒ.MeshCube": {
+      "idResource": "MeshCube|2021-10-14T12:14:21.526Z|84261",
+      "name": "Laser Arm",
+      "type": "MeshCube"
+    }
+  },
+  "Material|2021-10-14T12:14:30.420Z|26915": {
+    "ƒ.Material": {
+      "name": "Laser Arm Material",
+      "idResource": "Material|2021-10-14T12:14:30.420Z|26915",
+      "shader": "ShaderUniColor",
+      "coat": {
+        "ƒ.CoatColored": {
+          "color": "[1, 0.4627450980392157, 0.4588235294117647, 1]"
+        }
+      }
+    }
+  },
   "Graph|2021-10-14T11:50:21.744Z|34327": {
     "ƒ.Graph": {
       "name": "Scene",
@@ -246,21 +329,6 @@
                       "ƒ.Node": {
                         "name": "Body",
                         "components": {
-                          "ComponentMesh": [
-                            {
-                              "ƒ.ComponentMesh": {
-                                "idMesh": "MeshPolygon|2021-10-14T12:09:04.140Z|56221",
-                                "pivot": {
-                                  "translation": "[0, 0, 0]",
-                                  "rotation": "[0, 0, 0]",
-                                  "scaling": "[0.5, 1, 1]"
-                                },
-                                "Component": {
-                                  "active": true
-                                }
-                              }
-                            }
-                          ],
                           "ComponentMaterial": [
                             {
                               "ƒ.ComponentMaterial": {
@@ -276,6 +344,21 @@
                                   "active": true
                                 },
                                 "idMaterial": "Material|2021-10-14T12:09:30.931Z|61067"
+                              }
+                            }
+                          ],
+                          "ComponentMesh": [
+                            {
+                              "ƒ.ComponentMesh": {
+                                "idMesh": "MeshSphere|2021-10-14T12:43:34.731Z|47479",
+                                "pivot": {
+                                  "translation": "[0, 0, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
                               }
                             }
                           ]
@@ -457,37 +540,6 @@
       "type": "Graph"
     }
   },
-  "Material|2021-10-14T11:54:28.588Z|09457": {
-    "ƒ.Material": {
-      "name": "Ground Material",
-      "idResource": "Material|2021-10-14T11:54:28.588Z|09457",
-      "shader": "ShaderUniColor",
-      "coat": {
-        "ƒ.CoatColored": {
-          "color": "[0.17647058823529413, 0.20392156862745098, 0.21176470588235294, 1]"
-        }
-      }
-    }
-  },
-  "MeshCube|2021-10-14T11:59:53.705Z|54043": {
-    "ƒ.MeshCube": {
-      "idResource": "MeshCube|2021-10-14T11:59:53.705Z|54043",
-      "name": "Border Mesh",
-      "type": "MeshCube"
-    }
-  },
-  "Material|2021-10-14T12:00:21.882Z|12479": {
-    "ƒ.Material": {
-      "name": "Border Material",
-      "idResource": "Material|2021-10-14T12:00:21.882Z|12479",
-      "shader": "ShaderUniColor",
-      "coat": {
-        "ƒ.CoatColored": {
-          "color": "[0.07450980392156863, 0.08235294117647059, 0.3058823529411765, 1]"
-        }
-      }
-    }
-  },
   "MeshPolygon|2021-10-14T12:09:04.140Z|56221": {
     "ƒ.MeshPolygon": {
       "idResource": "MeshPolygon|2021-10-14T12:09:04.140Z|56221",
@@ -503,56 +555,13 @@
       "fitTexture": true
     }
   },
-  "Material|2021-10-14T12:09:30.931Z|61067": {
-    "ƒ.Material": {
-      "name": "Player Body Material",
-      "idResource": "Material|2021-10-14T12:09:30.931Z|61067",
-      "shader": "ShaderUniColor",
-      "coat": {
-        "ƒ.CoatColored": {
-          "color": "[0.4823529411764706, 0.9568627450980393, 0.9019607843137255, 1]"
-        }
-      }
-    }
-  },
-  "MeshSphere|2021-10-14T12:13:22.276Z|79559": {
+  "MeshSphere|2021-10-14T12:43:34.731Z|47479": {
     "ƒ.MeshSphere": {
-      "idResource": "MeshSphere|2021-10-14T12:13:22.276Z|79559",
-      "name": "Laser Center",
+      "idResource": "MeshSphere|2021-10-14T12:43:34.731Z|47479",
+      "name": "Agent Body",
       "type": "MeshSphere",
       "sectors": 8,
       "stacks": 8
-    }
-  },
-  "Material|2021-10-14T12:13:32.371Z|72844": {
-    "ƒ.Material": {
-      "name": "Laser Center Material",
-      "idResource": "Material|2021-10-14T12:13:32.371Z|72844",
-      "shader": "ShaderUniColor",
-      "coat": {
-        "ƒ.CoatColored": {
-          "color": "[0.9176470588235294, 0.6352941176470588, 0.023529411764705882, 1]"
-        }
-      }
-    }
-  },
-  "MeshCube|2021-10-14T12:14:21.526Z|84261": {
-    "ƒ.MeshCube": {
-      "idResource": "MeshCube|2021-10-14T12:14:21.526Z|84261",
-      "name": "Laser Arm",
-      "type": "MeshCube"
-    }
-  },
-  "Material|2021-10-14T12:14:30.420Z|26915": {
-    "ƒ.Material": {
-      "name": "Laser Arm Material",
-      "idResource": "Material|2021-10-14T12:14:30.420Z|26915",
-      "shader": "ShaderUniColor",
-      "coat": {
-        "ƒ.CoatColored": {
-          "color": "[0.9176470588235294, 0.6352941176470588, 0.023529411764705882, 1]"
-        }
-      }
     }
   }
 }
