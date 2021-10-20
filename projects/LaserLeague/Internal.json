@@ -44,7 +44,7 @@
       "shader": "ShaderUniColor",
       "coat": {
         "ƒ.CoatColored": {
-          "color": "[0.03529411764705882, 0.5176470588235295, 0.8901960784313725, 1]"
+          "color": "[0.8823529411764706, 0.03529411764705882, 0.03529411764705882, 1]"
         }
       }
     }
@@ -87,6 +87,15 @@
           "color": "[1, 0.4627450980392157, 0.4588235294117647, 1]"
         }
       }
+    }
+  },
+  "MeshSphere|2021-10-14T12:43:34.731Z|47479": {
+    "ƒ.MeshSphere": {
+      "idResource": "MeshSphere|2021-10-14T12:43:34.731Z|47479",
+      "name": "Agent Body",
+      "type": "MeshSphere",
+      "sectors": 8,
+      "stacks": 8
     }
   },
   "Graph|2021-10-14T11:50:21.744Z|34327": {
@@ -323,7 +332,22 @@
               {
                 "ƒ.Node": {
                   "name": "Agent 1",
-                  "components": {},
+                  "components": {
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0, 0, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ]
+                  },
                   "children": [
                     {
                       "ƒ.Node": {
@@ -359,6 +383,47 @@
                                 "Component": {
                                   "active": true
                                 }
+                              }
+                            }
+                          ]
+                        },
+                        "children": []
+                      }
+                    },
+                    {
+                      "ƒ.Node": {
+                        "name": "Head",
+                        "components": {
+                          "ComponentMesh": [
+                            {
+                              "ƒ.ComponentMesh": {
+                                "idMesh": "MeshSphere|2021-10-14T12:43:34.731Z|47479",
+                                "pivot": {
+                                  "translation": "[0, 0.30000001192092896, 0.30000001192092896]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[0.5, 0.5, 0.5]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMaterial": [
+                            {
+                              "ƒ.ComponentMaterial": {
+                                "sortForAlpha": false,
+                                "clrPrimary": "[1, 1, 1, 1]",
+                                "clrSecondary": "[1, 1, 1, 1]",
+                                "pivot": {
+                                  "translation": "[0, 0]",
+                                  "rotation": 0,
+                                  "scaling": "[1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                },
+                                "idMaterial": "Material|2021-10-20T16:50:20.529Z|02081"
                               }
                             }
                           ]
@@ -555,13 +620,16 @@
       "fitTexture": true
     }
   },
-  "MeshSphere|2021-10-14T12:43:34.731Z|47479": {
-    "ƒ.MeshSphere": {
-      "idResource": "MeshSphere|2021-10-14T12:43:34.731Z|47479",
-      "name": "Agent Body",
-      "type": "MeshSphere",
-      "sectors": 8,
-      "stacks": 8
+  "Material|2021-10-20T16:50:20.529Z|02081": {
+    "ƒ.Material": {
+      "name": "Agent Head Material",
+      "idResource": "Material|2021-10-20T16:50:20.529Z|02081",
+      "shader": "ShaderUniColor",
+      "coat": {
+        "ƒ.CoatColored": {
+          "color": "[0.8549019607843137, 0.9137254901960784, 0.00392156862745098, 1]"
+        }
+      }
     }
   }
 }
