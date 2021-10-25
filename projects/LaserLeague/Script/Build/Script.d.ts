@@ -1,19 +1,17 @@
-import ƒ = FudgeCore;
 declare namespace Script {
+    import ƒ = FudgeCore;
     class Agent {
         mesh: ƒ.Node;
+        ctrForward: ƒ.Control;
+        speed: number;
         transformMatrix: ƒ.Matrix4x4;
-        velocity: number;
-        acceleration: number;
-        accelerationIncrease: number;
-        maxSpeed: number;
-        minSpeed: number;
-        movedLastFrame: boolean;
-        constructor(mesh: ƒ.Node, maxSpeed: number, accelerationIncrease: number);
+        rotationSpeed: number;
+        private deltaTime;
+        constructor(mesh: ƒ.Node, speed: number, rotation: number);
         update(): void;
         private handleAgentMovement;
-        private accelerate;
-        private deAccelerate;
+        private handleAgentRotation;
+        getTranslation(): ƒ.Vector3;
     }
 }
 declare namespace Script {
@@ -23,6 +21,20 @@ declare namespace Script {
         message: string;
         constructor();
         hndEvent: (_event: Event) => void;
+    }
+}
+declare namespace Script {
+    import ƒ = FudgeCore;
+    class Laser {
+        mesh: ƒ.Node;
+        transformMatrix: ƒ.Matrix4x4;
+        ctrForward: ƒ.Control;
+        deltaTime: number;
+        rotationSpeed: number;
+        constructor(mesh: ƒ.Node, rotationSpeed: number);
+        update(): void;
+        rotate(): void;
+        getBeam(index: number): ƒ.Node;
     }
 }
 declare namespace Script {

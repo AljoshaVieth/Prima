@@ -1,54 +1,43 @@
 "use strict";
-var ƒ = FudgeCore;
 var Script;
 (function (Script) {
+    var ƒ = FudgeCore;
     class Agent {
-        constructor(mesh, maxSpeed, accelerationIncrease) {
+        /*
+        velocity: number;
+        acceleration: number;
+        accelerationIncrease: number;
+        maxSpeed: number;
+        minSpeed: number;
+        movedLastFrame: boolean;
+        */
+        constructor(mesh, speed, rotation) {
             this.mesh = mesh;
-            this.minSpeed = 0.0;
-            this.maxSpeed = maxSpeed;
-            this.accelerationIncrease = accelerationIncrease;
+            this.speed = speed;
+            this.rotationSpeed = rotation;
             this.transformMatrix = mesh.getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.movedLastFrame = false;
-            this.velocity = 0.0;
-            this.acceleration = 0.0;
+            this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
+            this.ctrForward.setDelay(20);
         }
         update() {
+            this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
             this.handleAgentMovement();
+            this.handleAgentRotation();
         }
         handleAgentMovement() {
-            //(de-)accelerate
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])) {
-                if (this.velocity < this.maxSpeed) {
-                    this.accelerate();
-                }
-            }
-            else {
-                this.deAccelerate();
-            }
-            //move
-            this.transformMatrix.translateY(this.velocity);
-            //rotate
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
-                this.transformMatrix.rotateZ(3);
-            }
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
-                this.transformMatrix.rotateZ(-3);
-            }
+            let inputValue = (ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
+                + ƒ.Keyboard.mapToValue(1, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
+            this.ctrForward.setInput(inputValue * this.deltaTime);
+            this.transformMatrix.translateY(this.ctrForward.getOutput());
         }
-        accelerate() {
-            this.velocity = this.velocity + this.acceleration + this.accelerationIncrease;
+        handleAgentRotation() {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
+                this.transformMatrix.rotateZ(this.rotationSpeed * this.deltaTime);
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
+                this.transformMatrix.rotateZ(-this.rotationSpeed * this.deltaTime);
         }
-        deAccelerate() {
-            if (this.acceleration > this.accelerationIncrease) {
-                if ((this.acceleration - this.accelerationIncrease) > 0.0) {
-                    this.acceleration = this.acceleration - this.accelerationIncrease;
-                    this.velocity = this.velocity + this.acceleration;
-                    return;
-                }
-            }
-            this.acceleration = 0.0;
-            this.velocity = 0.0;
+        getTranslation() {
+            return this.mesh.mtxWorld.translation;
         }
     }
     Script.Agent = Agent;
@@ -89,19 +78,49 @@ var Script;
 var Script;
 (function (Script) {
     var ƒ = FudgeCore;
+    class Laser {
+        constructor(mesh, rotationSpeed) {
+            this.mesh = mesh;
+            this.rotationSpeed = rotationSpeed;
+            this.transformMatrix = mesh.getComponent(ƒ.ComponentTransform).mtxLocal;
+            //this.ctrForward = new ƒ.Control("Forward", 1, ƒ.CONTROL_TYPE.PROPORTIONAL);
+        }
+        update() {
+            this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
+            /*
+            let inputValue: number = (
+                ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.R])
+            );
+            this.ctrForward.setInput(inputValue*this.deltaTime);
+            */
+            this.rotate();
+        }
+        rotate() {
+            this.transformMatrix.rotateZ(this.rotationSpeed * this.deltaTime);
+        }
+        getBeam(index) {
+            return this.mesh.getChildren()[0].getChildren()[0].getChildren()[index];
+        }
+    }
+    Script.Laser = Laser;
+})(Script || (Script = {}));
+var Script;
+(function (Script) {
+    var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
-    let laserTransformMatrix;
     let agent;
+    let laser;
     function start(_event) {
         viewport = _event.detail;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         let graph = viewport.getBranch();
-        let laser = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
+        let laserNode = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
         let agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
-        agent = new Script.Agent(agentMesh, 0.09, 0.001);
-        laserTransformMatrix = laser.getComponent(ƒ.ComponentTransform).mtxLocal;
+        agent = new Script.Agent(agentMesh, 500, 360);
+        laser = new Script.Laser(laserNode, 50);
+        //laserTransformMatrix = laser.getComponent(ƒ.ComponentTransform).mtxLocal;
         console.log(graph);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -109,9 +128,19 @@ var Script;
     function update(_event) {
         // ƒ.Physics.world.simulate();  // if physics is included and used
         agent.update();
-        laserTransformMatrix.rotateZ(5);
+        laser.update();
+        checkCollision();
         viewport.draw();
         ƒ.AudioManager.default.update();
+    }
+    //TODO move code to other class
+    function checkCollision() {
+        let beam = laser.getBeam(0);
+        let posLocal = ƒ.Vector3.TRANSFORMATION(agent.getTranslation(), beam.mtxWorldInverse, true);
+        if (posLocal.get()[0] < 1) {
+            console.log("hit! " + posLocal.toString());
+        }
+        //console.log(posLocal.toString());
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map
