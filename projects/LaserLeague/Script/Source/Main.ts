@@ -11,20 +11,14 @@ namespace Script {
 
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
-
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
-    let graph: ƒ.Node = viewport.getBranch();
-    let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
 
-    
+    let graph: ƒ.Node = viewport.getBranch();
+    let laserMesh: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
     let agentMesh: ƒ.Node = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
     agent = new Agent(agentMesh, 500, 360);
-
-    laser = new Laser(laserNode, 50);
-  
-    //laserTransformMatrix = laser.getComponent(ƒ.ComponentTransform).mtxLocal;
+    laser = new Laser(laserMesh, 50);
     console.log(graph);
-
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
@@ -39,16 +33,15 @@ namespace Script {
   }
 
 
-  //TODO move code to other class
   function checkCollision(): void {
     let beam: ƒ.Node = laser.getBeam(0);
     let posLocal: ƒ.Vector3 = ƒ.Vector3.TRANSFORMATION(agent.getTranslation(), beam.mtxWorldInverse, true);
-    if(posLocal.get()[0] <1){
+    if (posLocal.get()[0] < 1) {
       console.log("hit! " + posLocal.toString());
     }
     //console.log(posLocal.toString());
 
-}
+  }
 
 
 }
