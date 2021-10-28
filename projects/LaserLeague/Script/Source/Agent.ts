@@ -4,6 +4,7 @@ namespace Script {
         mesh: ƒ.Node;
         ctrForward: ƒ.Control;
         speed: number;
+        
         transformMatrix: ƒ.Matrix4x4;
         rotationSpeed: number;
         private deltaTime: number;
@@ -53,6 +54,10 @@ namespace Script {
 
         getTranslation(): ƒ.Vector3 {
             return this.mesh.mtxWorld.translation;
+        }
+
+        getMesh(): ƒ.Node {
+            return this.mesh;
         }
 
 
