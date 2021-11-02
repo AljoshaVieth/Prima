@@ -45,7 +45,10 @@ declare namespace Script {
     class RotatorComponent extends ƒ.ComponentScript {
         static readonly iSubclass: number;
         message: string;
+        rotationSpeed: number;
+        private deltaTime;
         constructor();
         hndEvent: (_event: Event) => void;
+        update: (_event: Event) => void;
     }
 }

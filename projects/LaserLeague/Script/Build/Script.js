@@ -3,12 +3,6 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     class Agent {
-        mesh;
-        ctrForward;
-        speed;
-        transformMatrix;
-        rotationSpeed;
-        deltaTime;
         /*
         velocity: number;
         acceleration: number;
@@ -56,12 +50,22 @@ var Script;
     var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
     class CustomComponentScript extends ƒ.ComponentScript {
-        // Register the script as component for use in the editor via drag&drop
-        static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
-        // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "CustomComponentScript added to ";
         constructor() {
             super();
+            // Properties may be mutated by users in the editor via the automatically created user interface
+            this.message = "CustomComponentScript added to ";
+            // Activate the functions of this component as response to events
+            this.hndEvent = (_event) => {
+                switch (_event.type) {
+                    case "componentAdd" /* COMPONENT_ADD */:
+                        ƒ.Debug.log(this.message, this.node);
+                        break;
+                    case "componentRemove" /* COMPONENT_REMOVE */:
+                        this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                        this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                        break;
+                }
+            };
             // Don't start when running in editor
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
@@ -69,30 +73,15 @@ var Script;
             this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
             this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
         }
-        // Activate the functions of this component as response to events
-        hndEvent = (_event) => {
-            switch (_event.type) {
-                case "componentAdd" /* COMPONENT_ADD */:
-                    ƒ.Debug.log(this.message, this.node);
-                    break;
-                case "componentRemove" /* COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-                    break;
-            }
-        };
     }
+    // Register the script as component for use in the editor via drag&drop
+    CustomComponentScript.iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
     Script.CustomComponentScript = CustomComponentScript;
 })(Script || (Script = {}));
 var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     class Laser {
-        mesh;
-        transformMatrix;
-        ctrForward;
-        deltaTime;
-        rotationSpeed;
         constructor(mesh, rotationSpeed) {
             this.mesh = mesh;
             this.rotationSpeed = rotationSpeed;
@@ -126,21 +115,25 @@ var Script;
     document.addEventListener("interactiveViewportStarted", start);
     let agentMesh;
     let agent;
-    let laser;
+    //let laser: Laser;
     let agentMutator;
     async function start(_event) {
         viewport = _event.detail;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         let graph = viewport.getBranch();
-        let laserNode = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
+        // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
         agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
         agent = new Script.Agent(agentMesh, 500, 360);
         agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
         let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
-        let copyLaser = await ƒ.Project.createGraphInstance(graphLaser);
-        copyLaser.getComponent(ƒ.ComponentTransform);
-        graph.getChildrenByName("Lasers")[0].addChild(copyLaser);
-        laser = new Script.Laser(laserNode, 50);
+        for (let i = 0; i < 4; i++) {
+            let laser = await ƒ.Project.createGraphInstance(graphLaser);
+            for (let j = 0; j < 4; j++) {
+            }
+            laser.mtxLocal.translateX(5 * i);
+            graph.getChildrenByName("Lasers")[0].addChild(laser);
+        }
+        //laser = new Laser(laserNode, 50);
         //laserTransformMatrix = laser.getComponent(ƒ.ComponentTransform).mtxLocal;
         console.log(graph);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
@@ -149,40 +142,61 @@ var Script;
     function update(_event) {
         // ƒ.Physics.world.simulate();  // if physics is included and used
         agent.update();
-        laser.update();
-        checkCollision();
+        //laser.update();
+        //checkCollision();
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
-    //TODO move code to other class
-    function checkCollision() {
-        let beam = laser.getBeam(0);
-        let posLocal = ƒ.Vector3.TRANSFORMATION(agent.getTranslation(), beam.mtxWorldInverse, true);
-        let minX = beam.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 + agentMesh.radius;
-        let minY = beam.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.y + agentMesh.radius;
-        if (posLocal.x <= (minX) && posLocal.x >= -(minX) && posLocal.y <= minY && posLocal.y >= 0) {
-            console.log("hit");
-            agentMesh.getComponent(ƒ.ComponentTransform).mutate(agentMutator);
-        }
-        /*
-        if(posLocal.get()[0] <1){
-          console.log("hit! " + posLocal.toString());
-        }
-        //console.log(posLocal.toString());
-    */
+    /*
+    function checkCollision(): void {
+      let beam: ƒ.Node = laser.getBeam(0);
+      let posLocal: ƒ.Vector3 = ƒ.Vector3.TRANSFORMATION(agent.getTranslation(), beam.mtxWorldInverse, true);
+  
+      let minX = beam.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 + agentMesh.radius;
+      let minY = beam.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.y + agentMesh.radius;
+      if (posLocal.x <= (minX) && posLocal.x >= -(minX) && posLocal.y <= minY && posLocal.y >= 0) {
+        console.log("hit");
+        agentMesh.getComponent(ƒ.ComponentTransform).mutate(agentMutator);
+      }
+  
+      /*
+      if(posLocal.get()[0] <1){
+        console.log("hit! " + posLocal.toString());
+      }
+      //console.log(posLocal.toString());
+  
     }
+  */
 })(Script || (Script = {}));
 var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
     class RotatorComponent extends ƒ.ComponentScript {
-        // Register the script as component for use in the editor via drag&drop
-        static iSubclass = ƒ.Component.registerSubclass(RotatorComponent);
-        // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "RotatorComponent added to ";
         constructor() {
             super();
+            // Properties may be mutated by users in the editor via the automatically created user interface
+            this.message = "RotatorComponent added to ";
+            // Activate the functions of this component as response to events
+            this.hndEvent = (_event) => {
+                switch (_event.type) {
+                    case "componentAdd" /* COMPONENT_ADD */:
+                        ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+                        ƒ.Debug.log(this.message, this.node);
+                        let random = new ƒ.Random();
+                        this.rotationSpeed = random.getRangeFloored(20, 200);
+                        break;
+                    case "componentRemove" /* COMPONENT_REMOVE */:
+                        this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                        this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                        break;
+                }
+            };
+            this.update = (_event) => {
+                this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
+                this.node.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
+                console.log("rotating " + this.rotationSpeed);
+            };
             // Don't start when running in editor
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
@@ -190,19 +204,9 @@ var Script;
             this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
             this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
         }
-        // Activate the functions of this component as response to events
-        hndEvent = (_event) => {
-            switch (_event.type) {
-                case "componentAdd" /* COMPONENT_ADD */:
-                    ƒ.Debug.log(this.message, this.node);
-                    break;
-                case "componentRemove" /* COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-                    break;
-            }
-        };
     }
+    // Register the script as component for use in the editor via drag&drop
+    RotatorComponent.iSubclass = ƒ.Component.registerSubclass(RotatorComponent);
     Script.RotatorComponent = RotatorComponent;
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map

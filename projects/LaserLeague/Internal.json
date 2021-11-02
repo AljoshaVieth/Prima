@@ -493,6 +493,14 @@
               }
             }
           }
+        ],
+        "RotatorComponent": [
+          {
+            "Script.RotatorComponent": {
+              "active": true,
+              "message": "RotatorComponent added to "
+            }
+          }
         ]
       },
       "children": [
@@ -576,15 +584,7 @@
                                 "idMaterial": "Material|2021-10-14T12:14:30.420Z|26915"
                               }
                             }
-                          ],
-                          "RotatorComponent": [
-                            {
-                              "Script.RotatorComponent": {
-                                "active": true,
-                                "message": "RotatorComponent added to "
-                              }
-                            }
-                          ]
+                          ]          
                         },
                         "children": []
                       }

@@ -8,7 +8,7 @@ namespace Script {
 
   let agentMesh: ƒ.Node;
   let agent: Agent;
-  let laser: Laser;
+  //let laser: Laser;
   let agentMutator: ƒ.Mutator;
 
   async function start(_event: CustomEvent): Promise<void> {
@@ -16,21 +16,28 @@ namespace Script {
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     let graph: ƒ.Node = viewport.getBranch();
-    let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
-    
+    // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
+
     agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
     agent = new Agent(agentMesh, 500, 360);
-    
+
     agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
-    
-    let graphLaser:  ƒ.Graph= < ƒ.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
-    let copyLaser = await ƒ.Project.createGraphInstance(graphLaser);
-    copyLaser.getComponent(ƒ.ComponentTransform);
-    graph.getChildrenByName("Lasers")[0].addChild(copyLaser);
 
-    
+    let graphLaser: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
+    for (let i: number = 0; i < 4; i++) {
+      let laser = await ƒ.Project.createGraphInstance(graphLaser);
+      for (let j: number = 0; j < 4; j++) {
+      }
+      laser.mtxLocal.translateX(5 * i);
+      graph.getChildrenByName("Lasers")[0].addChild(laser);
+    }
 
-    laser = new Laser(laserNode, 50);
+
+
+
+
+
+    //laser = new Laser(laserNode, 50);
 
     //laserTransformMatrix = laser.getComponent(ƒ.ComponentTransform).mtxLocal;
     console.log(graph);
@@ -42,14 +49,14 @@ namespace Script {
   function update(_event: Event): void {
     // ƒ.Physics.world.simulate();  // if physics is included and used
     agent.update();
-    laser.update();
-    checkCollision();
+    //laser.update();
+    //checkCollision();
     viewport.draw();
     ƒ.AudioManager.default.update();
   }
 
 
-  //TODO move code to other class
+  /*
   function checkCollision(): void {
     let beam: ƒ.Node = laser.getBeam(0);
     let posLocal: ƒ.Vector3 = ƒ.Vector3.TRANSFORMATION(agent.getTranslation(), beam.mtxWorldInverse, true);
@@ -66,8 +73,9 @@ namespace Script {
       console.log("hit! " + posLocal.toString());
     }
     //console.log(posLocal.toString());
-*/
+
   }
+*/
 
 
 }
