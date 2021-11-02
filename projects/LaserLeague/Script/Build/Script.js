@@ -9,7 +9,7 @@ var Script;
             this.rotationSpeed = rotation;
             this.transformMatrix = mesh.getComponent(ƒ.ComponentTransform).mtxLocal;
             this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
-            this.ctrForward.setDelay(20);
+            this.ctrForward.setDelay(200);
         }
         update() {
             this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
@@ -17,10 +17,11 @@ var Script;
             this.handleAgentRotation();
         }
         handleAgentMovement() {
-            let inputValue = (ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
-                + ƒ.Keyboard.mapToValue(1, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
+            let inputValue = (ƒ.Keyboard.mapToValue(-5, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
+                + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
             this.ctrForward.setInput(inputValue * this.deltaTime);
             this.transformMatrix.translateY(this.ctrForward.getOutput());
+            console.log(this.ctrForward.getOutput());
         }
         handleAgentRotation() {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
@@ -99,25 +100,16 @@ var Script;
     let agent;
     //let laser: Laser;
     let agentMutator;
+    let graph;
     async function start(_event) {
         viewport = _event.detail;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        let graph = viewport.getBranch();
+        graph = viewport.getBranch();
         // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
         agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
         agent = new Script.Agent(agentMesh, 500, 360);
         agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
-        let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
-        for (let i = 0; i < 4; i++) {
-            let laser = await ƒ.Project.createGraphInstance(graphLaser);
-            for (let j = 0; j < 4; j++) {
-            }
-            laser.mtxLocal.translateX(5 * i);
-            graph.getChildrenByName("Lasers")[0].addChild(laser);
-        }
-        //laser = new Laser(laserNode, 50);
-        //laserTransformMatrix = laser.getComponent(ƒ.ComponentTransform).mtxLocal;
-        console.log(graph);
+        spawnLasers();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -128,6 +120,16 @@ var Script;
         //checkCollision();
         viewport.draw();
         ƒ.AudioManager.default.update();
+    }
+    async function spawnLasers() {
+        let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
+        for (let i = 0; i < 4; i++) {
+            let laser = await ƒ.Project.createGraphInstance(graphLaser);
+            for (let j = 0; j < 4; j++) {
+            }
+            laser.mtxLocal.translateX(5 * i);
+            graph.getChildrenByName("Lasers")[0].addChild(laser);
+        }
     }
     /*
     function checkCollision(): void {

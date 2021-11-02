@@ -10,12 +10,13 @@ namespace Script {
   let agent: Agent;
   //let laser: Laser;
   let agentMutator: ƒ.Mutator;
+  let graph: ƒ.Node;
 
   async function start(_event: CustomEvent): Promise<void> {
     viewport = _event.detail;
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
-    let graph: ƒ.Node = viewport.getBranch();
+    graph = viewport.getBranch();
     // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
 
     agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
@@ -23,25 +24,9 @@ namespace Script {
 
     agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
 
-    let graphLaser: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
-    for (let i: number = 0; i < 4; i++) {
-      let laser = await ƒ.Project.createGraphInstance(graphLaser);
-      for (let j: number = 0; j < 4; j++) {
-      }
-      laser.mtxLocal.translateX(5 * i);
-      graph.getChildrenByName("Lasers")[0].addChild(laser);
-    }
+    spawnLasers();
 
-
-
-
-
-
-    //laser = new Laser(laserNode, 50);
-
-    //laserTransformMatrix = laser.getComponent(ƒ.ComponentTransform).mtxLocal;
-    console.log(graph);
-
+    
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
@@ -55,6 +40,16 @@ namespace Script {
     ƒ.AudioManager.default.update();
   }
 
+  async function spawnLasers(): Promise<void> {
+    let graphLaser: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
+    for (let i: number = 0; i < 4; i++) {
+      let laser = await ƒ.Project.createGraphInstance(graphLaser);
+      for (let j: number = 0; j < 4; j++) {
+      }
+      laser.mtxLocal.translateX(5 * i);
+      graph.getChildrenByName("Lasers")[0].addChild(laser);
+    }
+  }
 
   /*
   function checkCollision(): void {

@@ -16,7 +16,7 @@ namespace Script {
             this.rotationSpeed = rotation;
             this.transformMatrix = mesh.getComponent(ƒ.ComponentTransform).mtxLocal;
             this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, ƒ.CONTROL_TYPE.PROPORTIONAL);
-            this.ctrForward.setDelay(20);
+            this.ctrForward.setDelay(200);
 
         }
 
@@ -29,11 +29,12 @@ namespace Script {
 
         private handleAgentMovement(): void {
             let inputValue: number = (
-                ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
-                + ƒ.Keyboard.mapToValue(1, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])
+                ƒ.Keyboard.mapToValue(-5, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
+                + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])
             );
             this.ctrForward.setInput(inputValue * this.deltaTime);
             this.transformMatrix.translateY(this.ctrForward.getOutput());
+            console.log(this.ctrForward.getOutput())
         }
 
         private handleAgentRotation(): void {
