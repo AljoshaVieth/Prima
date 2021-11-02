@@ -12,6 +12,7 @@ declare namespace Script {
         private handleAgentMovement;
         private handleAgentRotation;
         getTranslation(): ƒ.Vector3;
+        getMesh(): ƒ.Node;
     }
 }
 declare namespace Script {
@@ -38,4 +39,13 @@ declare namespace Script {
     }
 }
 declare namespace Script {
+}
+declare namespace Script {
+    import ƒ = FudgeCore;
+    class RotatorComponent extends ƒ.ComponentScript {
+        static readonly iSubclass: number;
+        message: string;
+        constructor();
+        hndEvent: (_event: Event) => void;
+    }
 }
