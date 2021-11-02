@@ -3,14 +3,6 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     class Agent {
-        /*
-        velocity: number;
-        acceleration: number;
-        accelerationIncrease: number;
-        maxSpeed: number;
-        minSpeed: number;
-        movedLastFrame: boolean;
-        */
         constructor(mesh, speed, rotation) {
             this.mesh = mesh;
             this.speed = speed;
@@ -83,16 +75,9 @@ var Script;
             this.mesh = mesh;
             this.rotationSpeed = rotationSpeed;
             this.transformMatrix = mesh.getComponent(ƒ.ComponentTransform).mtxLocal;
-            //this.ctrForward = new ƒ.Control("Forward", 1, ƒ.CONTROL_TYPE.PROPORTIONAL);
         }
         update() {
             this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
-            /*
-            let inputValue: number = (
-                ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.R])
-            );
-            this.ctrForward.setInput(inputValue*this.deltaTime);
-            */
             this.rotate();
         }
         rotate() {
@@ -116,11 +101,10 @@ var Script;
         viewport = _event.detail;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         let graph = viewport.getBranch();
-        let laserNode = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
+        let laserMesh = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
         let agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
         agent = new Script.Agent(agentMesh, 500, 360);
-        laser = new Script.Laser(laserNode, 50);
-        //laserTransformMatrix = laser.getComponent(ƒ.ComponentTransform).mtxLocal;
+        laser = new Script.Laser(laserMesh, 50);
         console.log(graph);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -133,7 +117,6 @@ var Script;
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
-    //TODO move code to other class
     function checkCollision() {
         let beam = laser.getBeam(0);
         let posLocal = ƒ.Vector3.TRANSFORMATION(agent.getTranslation(), beam.mtxWorldInverse, true);

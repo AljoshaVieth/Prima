@@ -34,7 +34,6 @@ namespace Script {
             );
             this.ctrForward.setInput(inputValue * this.deltaTime);
             this.transformMatrix.translateY(this.ctrForward.getOutput());
-
         }
 
         private handleAgentRotation(): void {
