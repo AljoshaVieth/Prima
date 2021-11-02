@@ -3,14 +3,6 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     class Agent {
-        /*
-        velocity: number;
-        acceleration: number;
-        accelerationIncrease: number;
-        maxSpeed: number;
-        minSpeed: number;
-        movedLastFrame: boolean;
-        */
         constructor(mesh, speed, rotation) {
             this.mesh = mesh;
             this.speed = speed;
@@ -38,9 +30,6 @@ var Script;
         }
         getTranslation() {
             return this.mesh.mtxWorld.translation;
-        }
-        getMesh() {
-            return this.mesh;
         }
     }
     Script.Agent = Agent;
@@ -86,16 +75,9 @@ var Script;
             this.mesh = mesh;
             this.rotationSpeed = rotationSpeed;
             this.transformMatrix = mesh.getComponent(ƒ.ComponentTransform).mtxLocal;
-            //this.ctrForward = new ƒ.Control("Forward", 1, ƒ.CONTROL_TYPE.PROPORTIONAL);
         }
         update() {
             this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
-            /*
-            let inputValue: number = (
-                ƒ.Keyboard.mapToValue(-1, 0, [ƒ.KEYBOARD_CODE.R])
-            );
-            this.ctrForward.setInput(inputValue*this.deltaTime);
-            */
             this.rotate();
         }
         rotate() {
@@ -113,15 +95,12 @@ var Script;
     ƒ.Debug.info("Main Program Template running!");
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
-    let agentMesh;
     let agent;
-    //let laser: Laser;
     let agentMutator;
-    async function start(_event) {
+    function start(_event) {
         viewport = _event.detail;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         let graph = viewport.getBranch();
-        // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
         agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
         agent = new Script.Agent(agentMesh, 500, 360);
         agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
@@ -147,26 +126,6 @@ var Script;
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
-    /*
-    function checkCollision(): void {
-      let beam: ƒ.Node = laser.getBeam(0);
-      let posLocal: ƒ.Vector3 = ƒ.Vector3.TRANSFORMATION(agent.getTranslation(), beam.mtxWorldInverse, true);
-  
-      let minX = beam.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 + agentMesh.radius;
-      let minY = beam.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.y + agentMesh.radius;
-      if (posLocal.x <= (minX) && posLocal.x >= -(minX) && posLocal.y <= minY && posLocal.y >= 0) {
-        console.log("hit");
-        agentMesh.getComponent(ƒ.ComponentTransform).mutate(agentMutator);
-      }
-  
-      /*
-      if(posLocal.get()[0] <1){
-        console.log("hit! " + posLocal.toString());
-      }
-      //console.log(posLocal.toString());
-  
-    }
-  */
 })(Script || (Script = {}));
 var Script;
 (function (Script) {
