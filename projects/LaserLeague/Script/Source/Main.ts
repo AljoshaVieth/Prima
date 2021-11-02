@@ -1,4 +1,4 @@
-namespace Script {
+namespace LaserLeague {
 
   import ƒ = FudgeCore;
   ƒ.Debug.info("Main Program Template running!")

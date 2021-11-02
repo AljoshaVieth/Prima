@@ -1,4 +1,4 @@
-namespace Script {
+namespace LaserLeague {
     import ƒ = FudgeCore;
     export class Agent {
         mesh: ƒ.Node;

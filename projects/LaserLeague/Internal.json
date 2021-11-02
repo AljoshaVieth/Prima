@@ -496,7 +496,7 @@
         ],
         "RotatorComponent": [
           {
-            "Script.RotatorComponent": {
+            "LaserLeague.RotatorComponent": {
               "active": true,
               "message": "RotatorComponent added to "
             }

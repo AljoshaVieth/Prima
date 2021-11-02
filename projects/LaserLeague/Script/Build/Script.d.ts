@@ -1,4 +1,4 @@
-declare namespace Script {
+declare namespace LaserLeague {
     import ƒ = FudgeCore;
     class Agent {
         mesh: ƒ.Node;
@@ -14,7 +14,7 @@ declare namespace Script {
         getTranslation(): ƒ.Vector3;
     }
 }
-declare namespace Script {
+declare namespace LaserLeague {
     import ƒ = FudgeCore;
     class CustomComponentScript extends ƒ.ComponentScript {
         static readonly iSubclass: number;
@@ -23,7 +23,7 @@ declare namespace Script {
         hndEvent: (_event: Event) => void;
     }
 }
-declare namespace Script {
+declare namespace LaserLeague {
     import ƒ = FudgeCore;
     class Laser {
         mesh: ƒ.Node;
@@ -37,9 +37,9 @@ declare namespace Script {
         getBeam(index: number): ƒ.Node;
     }
 }
-declare namespace Script {
+declare namespace LaserLeague {
 }
-declare namespace Script {
+declare namespace LaserLeague {
     import ƒ = FudgeCore;
     class RotatorComponent extends ƒ.ComponentScript {
         static readonly iSubclass: number;
