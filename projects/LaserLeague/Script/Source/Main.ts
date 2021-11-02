@@ -7,7 +7,7 @@ namespace LaserLeague {
   document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
 
   let agentMesh: ƒ.Node;
-  let agent: Agent;
+  let agent: oldAgent;
   //let laser: Laser;
   let agentMutator: ƒ.Mutator;
   let graph: ƒ.Node;
@@ -20,7 +20,7 @@ namespace LaserLeague {
     // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
 
     agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
-    agent = new Agent(agentMesh, 500, 360);
+    agent = new oldAgent(agentMesh, 500, 360);
 
     agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
 
@@ -38,6 +38,11 @@ namespace LaserLeague {
     //checkCollision();
     viewport.draw();
     ƒ.AudioManager.default.update();
+  }
+
+  function spawnAgent(): void {
+    let agent: ƒ.Node = new Agent();
+    graph.getChildrenByName("Agents")[0].addChild(agent);
   }
 
   async function spawnLasers(): Promise<void> {

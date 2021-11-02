@@ -1,6 +1,6 @@
 namespace LaserLeague {
     import ƒ = FudgeCore;
-    export class Agent {
+    export class oldAgent {
         mesh: ƒ.Node;
         ctrForward: ƒ.Control;
         speed: number;

@@ -2,42 +2,6 @@
 var LaserLeague;
 (function (LaserLeague) {
     var ƒ = FudgeCore;
-    class Agent {
-        constructor(mesh, speed, rotation) {
-            this.mesh = mesh;
-            this.speed = speed;
-            this.rotationSpeed = rotation;
-            this.transformMatrix = mesh.getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
-            this.ctrForward.setDelay(200);
-        }
-        update() {
-            this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
-            this.handleAgentMovement();
-            this.handleAgentRotation();
-        }
-        handleAgentMovement() {
-            let inputValue = (ƒ.Keyboard.mapToValue(-5, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
-                + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
-            this.ctrForward.setInput(inputValue * this.deltaTime);
-            this.transformMatrix.translateY(this.ctrForward.getOutput());
-            console.log(this.ctrForward.getOutput());
-        }
-        handleAgentRotation() {
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
-                this.transformMatrix.rotateZ(this.rotationSpeed * this.deltaTime);
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
-                this.transformMatrix.rotateZ(-this.rotationSpeed * this.deltaTime);
-        }
-        getTranslation() {
-            return this.mesh.mtxWorld.translation;
-        }
-    }
-    LaserLeague.Agent = Agent;
-})(LaserLeague || (LaserLeague = {}));
-var LaserLeague;
-(function (LaserLeague) {
-    var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(LaserLeague); // Register the namespace to FUDGE for serialization
     class CustomComponentScript extends ƒ.ComponentScript {
         constructor() {
@@ -107,7 +71,7 @@ var LaserLeague;
         graph = viewport.getBranch();
         // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
         agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
-        agent = new LaserLeague.Agent(agentMesh, 500, 360);
+        agent = new LaserLeague.oldAgent(agentMesh, 500, 360);
         agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
         spawnLasers();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
@@ -120,6 +84,10 @@ var LaserLeague;
         //checkCollision();
         viewport.draw();
         ƒ.AudioManager.default.update();
+    }
+    function spawnAgent() {
+        let agent = new LaserLeague.Agent();
+        graph.getChildrenByName("Agents")[0].addChild(agent);
     }
     async function spawnLasers() {
         let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
@@ -151,6 +119,20 @@ var LaserLeague;
   
     }
   */
+})(LaserLeague || (LaserLeague = {}));
+var LaserLeague;
+(function (LaserLeague) {
+    var ƒ = FudgeCore;
+    class Agent extends ƒ.Node {
+        constructor() {
+            super("Agent");
+            this.addComponent(new ƒ.ComponentTransform);
+            this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshQuad("MeshAgent"))); //TODO move to static variable for all agents
+            this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("mtrAgent", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(1, 0, 1, 1)))));
+            this.mtxLocal.scale(ƒ.Vector3.ONE(2));
+        }
+    }
+    LaserLeague.Agent = Agent;
 })(LaserLeague || (LaserLeague = {}));
 var LaserLeague;
 (function (LaserLeague) {
@@ -192,5 +174,41 @@ var LaserLeague;
     // Register the script as component for use in the editor via drag&drop
     RotatorComponent.iSubclass = ƒ.Component.registerSubclass(RotatorComponent);
     LaserLeague.RotatorComponent = RotatorComponent;
+})(LaserLeague || (LaserLeague = {}));
+var LaserLeague;
+(function (LaserLeague) {
+    var ƒ = FudgeCore;
+    class oldAgent {
+        constructor(mesh, speed, rotation) {
+            this.mesh = mesh;
+            this.speed = speed;
+            this.rotationSpeed = rotation;
+            this.transformMatrix = mesh.getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
+            this.ctrForward.setDelay(200);
+        }
+        update() {
+            this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
+            this.handleAgentMovement();
+            this.handleAgentRotation();
+        }
+        handleAgentMovement() {
+            let inputValue = (ƒ.Keyboard.mapToValue(-5, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
+                + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
+            this.ctrForward.setInput(inputValue * this.deltaTime);
+            this.transformMatrix.translateY(this.ctrForward.getOutput());
+            console.log(this.ctrForward.getOutput());
+        }
+        handleAgentRotation() {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
+                this.transformMatrix.rotateZ(this.rotationSpeed * this.deltaTime);
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
+                this.transformMatrix.rotateZ(-this.rotationSpeed * this.deltaTime);
+        }
+        getTranslation() {
+            return this.mesh.mtxWorld.translation;
+        }
+    }
+    LaserLeague.oldAgent = oldAgent;
 })(LaserLeague || (LaserLeague = {}));
 //# sourceMappingURL=Script.js.map
