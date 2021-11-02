@@ -95,12 +95,15 @@ var Script;
     ƒ.Debug.info("Main Program Template running!");
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
+    let agentMesh;
     let agent;
+    //let laser: Laser;
     let agentMutator;
-    function start(_event) {
+    async function start(_event) {
         viewport = _event.detail;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         let graph = viewport.getBranch();
+        // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
         agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
         agent = new Script.Agent(agentMesh, 500, 360);
         agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
@@ -126,6 +129,26 @@ var Script;
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
+    /*
+    function checkCollision(): void {
+      let beam: ƒ.Node = laser.getBeam(0);
+      let posLocal: ƒ.Vector3 = ƒ.Vector3.TRANSFORMATION(agent.getTranslation(), beam.mtxWorldInverse, true);
+  
+      let minX = beam.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.x / 2 + agentMesh.radius;
+      let minY = beam.getComponent(ƒ.ComponentMesh).mtxPivot.scaling.y + agentMesh.radius;
+      if (posLocal.x <= (minX) && posLocal.x >= -(minX) && posLocal.y <= minY && posLocal.y >= 0) {
+        console.log("hit");
+        agentMesh.getComponent(ƒ.ComponentTransform).mutate(agentMutator);
+      }
+  
+      /*
+      if(posLocal.get()[0] <1){
+        console.log("hit! " + posLocal.toString());
+      }
+      //console.log(posLocal.toString());
+  
+    }
+  */
 })(Script || (Script = {}));
 var Script;
 (function (Script) {

@@ -12,7 +12,6 @@ declare namespace Script {
         private handleAgentMovement;
         private handleAgentRotation;
         getTranslation(): ƒ.Vector3;
-        getMesh(): ƒ.Node;
     }
 }
 declare namespace Script {
