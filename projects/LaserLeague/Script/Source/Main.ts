@@ -6,10 +6,6 @@ namespace LaserLeague {
   let viewport: ƒ.Viewport;
   document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
 
-  let agentMesh: ƒ.Node;
-  let agent: oldAgent;
-  //let laser: Laser;
-  let agentMutator: ƒ.Mutator;
   let graph: ƒ.Node;
 
   async function start(_event: CustomEvent): Promise<void> {
@@ -17,14 +13,9 @@ namespace LaserLeague {
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     graph = viewport.getBranch();
-    // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
-
-    agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
-    agent = new oldAgent(agentMesh, 500, 360);
-
-    agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
 
     spawnLasers();
+    spawnAgent();
 
     
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
@@ -33,7 +24,6 @@ namespace LaserLeague {
 
   function update(_event: Event): void {
     // ƒ.Physics.world.simulate();  // if physics is included and used
-    agent.update();
     //laser.update();
     //checkCollision();
     viewport.draw();
@@ -41,7 +31,7 @@ namespace LaserLeague {
   }
 
   function spawnAgent(): void {
-    let agent: ƒ.Node = new Agent();
+    let agent: ƒ.Node = new Agent(0, 360);
     graph.getChildrenByName("Agents")[0].addChild(agent);
   }
 

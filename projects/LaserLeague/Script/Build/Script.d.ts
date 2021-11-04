@@ -1,5 +1,20 @@
 declare namespace LaserLeague {
     import ƒ = FudgeCore;
+    class Agent extends ƒ.Node {
+        mesh: ƒ.Node;
+        ctrForward: ƒ.Control;
+        speed: number;
+        rotationSpeed: number;
+        private deltaTime;
+        constructor(speed: number, rotationSpeed: number);
+        private initiatePositionAndScale;
+        private update;
+        private handleAgentMovement;
+        private handleAgentRotation;
+    }
+}
+declare namespace LaserLeague {
+    import ƒ = FudgeCore;
     class CustomComponentScript extends ƒ.ComponentScript {
         static readonly iSubclass: number;
         message: string;
@@ -22,12 +37,6 @@ declare namespace LaserLeague {
     }
 }
 declare namespace LaserLeague {
-}
-declare namespace LaserLeague {
-    import ƒ = FudgeCore;
-    class Agent extends ƒ.Node {
-        constructor();
-    }
 }
 declare namespace LaserLeague {
     import ƒ = FudgeCore;

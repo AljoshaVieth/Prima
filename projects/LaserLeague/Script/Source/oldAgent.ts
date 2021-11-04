@@ -34,7 +34,7 @@ namespace LaserLeague {
             );
             this.ctrForward.setInput(inputValue * this.deltaTime);
             this.transformMatrix.translateY(this.ctrForward.getOutput());
-            console.log(this.ctrForward.getOutput())
+            //console.log(this.ctrForward.getOutput())
         }
 
         private handleAgentRotation(): void {

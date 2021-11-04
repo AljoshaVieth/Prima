@@ -45,7 +45,7 @@ namespace LaserLeague {
     public update = (_event: Event): void => {
       this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
       this.node.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
-      console.log("rotating " + this.rotationSpeed);
+     // console.log("rotating " + this.rotationSpeed);
     }
 
     // protected reduceMutator(_mutator: ƒ.Mutator): void {

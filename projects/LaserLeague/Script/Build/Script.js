@@ -2,6 +2,49 @@
 var LaserLeague;
 (function (LaserLeague) {
     var ƒ = FudgeCore;
+    class Agent extends ƒ.Node {
+        constructor(speed, rotationSpeed) {
+            super("Agent");
+            this.update = (_event) => {
+                this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
+                this.handleAgentMovement();
+                this.handleAgentRotation();
+            };
+            this.rotationSpeed = rotationSpeed;
+            this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
+            this.ctrForward.setDelay(200);
+            this.initiatePositionAndScale();
+            ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+        }
+        initiatePositionAndScale() {
+            this.addComponent(new ƒ.ComponentTransform);
+            this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshQuad("MeshAgent"))); //TODO move to static variable for all agents
+            this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("mtrAgent", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(1, 0, 1, 1)))));
+            //set position
+            this.mtxLocal.translateZ(0.5);
+            this.mtxLocal.translateY(4);
+            //set scale
+            this.mtxLocal.scale(ƒ.Vector3.ONE(0.5));
+        }
+        handleAgentMovement() {
+            let inputValue = (ƒ.Keyboard.mapToValue(-5, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
+                + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
+            this.ctrForward.setInput(inputValue * this.deltaTime);
+            this.mtxLocal.translateY(this.ctrForward.getOutput());
+            //console.log(this.ctrForward.getOutput())
+        }
+        handleAgentRotation() {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
+                this.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
+                this.mtxLocal.rotateZ(-this.rotationSpeed * this.deltaTime);
+        }
+    }
+    LaserLeague.Agent = Agent;
+})(LaserLeague || (LaserLeague = {}));
+var LaserLeague;
+(function (LaserLeague) {
+    var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(LaserLeague); // Register the namespace to FUDGE for serialization
     class CustomComponentScript extends ƒ.ComponentScript {
         constructor() {
@@ -60,33 +103,25 @@ var LaserLeague;
     ƒ.Debug.info("Main Program Template running!");
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
-    let agentMesh;
-    let agent;
-    //let laser: Laser;
-    let agentMutator;
     let graph;
     async function start(_event) {
         viewport = _event.detail;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         graph = viewport.getBranch();
-        // let laserNode: ƒ.Node = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser 1")[0];
-        agentMesh = graph.getChildrenByName("Agents")[0].getChildrenByName("Agent 1")[0];
-        agent = new LaserLeague.oldAgent(agentMesh, 500, 360);
-        agentMutator = agentMesh.getComponent(ƒ.ComponentTransform);
         spawnLasers();
+        spawnAgent();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         // ƒ.Physics.world.simulate();  // if physics is included and used
-        agent.update();
         //laser.update();
         //checkCollision();
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
     function spawnAgent() {
-        let agent = new LaserLeague.Agent();
+        let agent = new LaserLeague.Agent(0, 360);
         graph.getChildrenByName("Agents")[0].addChild(agent);
     }
     async function spawnLasers() {
@@ -123,20 +158,6 @@ var LaserLeague;
 var LaserLeague;
 (function (LaserLeague) {
     var ƒ = FudgeCore;
-    class Agent extends ƒ.Node {
-        constructor() {
-            super("Agent");
-            this.addComponent(new ƒ.ComponentTransform);
-            this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshQuad("MeshAgent"))); //TODO move to static variable for all agents
-            this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("mtrAgent", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(1, 0, 1, 1)))));
-            this.mtxLocal.scale(ƒ.Vector3.ONE(2));
-        }
-    }
-    LaserLeague.Agent = Agent;
-})(LaserLeague || (LaserLeague = {}));
-var LaserLeague;
-(function (LaserLeague) {
-    var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(LaserLeague); // Register the namespace to FUDGE for serialization
     class RotatorComponent extends ƒ.ComponentScript {
         constructor() {
@@ -161,7 +182,7 @@ var LaserLeague;
             this.update = (_event) => {
                 this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
                 this.node.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
-                console.log("rotating " + this.rotationSpeed);
+                // console.log("rotating " + this.rotationSpeed);
             };
             // Don't start when running in editor
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
@@ -197,7 +218,7 @@ var LaserLeague;
                 + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
             this.ctrForward.setInput(inputValue * this.deltaTime);
             this.transformMatrix.translateY(this.ctrForward.getOutput());
-            console.log(this.ctrForward.getOutput());
+            //console.log(this.ctrForward.getOutput())
         }
         handleAgentRotation() {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
