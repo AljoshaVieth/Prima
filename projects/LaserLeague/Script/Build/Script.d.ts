@@ -1,12 +1,14 @@
 declare namespace LaserLeague {
     import ƒ = FudgeCore;
     class Agent extends ƒ.Node {
+        health: number;
+        name: string;
         mesh: ƒ.Node;
         ctrForward: ƒ.Control;
         speed: number;
         rotationSpeed: number;
         private deltaTime;
-        constructor(speed: number, rotationSpeed: number);
+        constructor(name: string, speed: number, rotationSpeed: number);
         private initiatePositionAndScale;
         private update;
         private handleAgentMovement;
@@ -21,6 +23,19 @@ declare namespace LaserLeague {
         constructor();
         hndEvent: (_event: Event) => void;
     }
+}
+declare namespace LaserLeague {
+    import ƒ = FudgeCore;
+    class GameState extends ƒ.Mutable {
+        hits: number;
+        protected reduceMutator(_mutator: ƒ.Mutator): void;
+    }
+    export let gameState: GameState;
+    export class Hud {
+        private static controller;
+        static start(): void;
+    }
+    export {};
 }
 declare namespace LaserLeague {
     import ƒ = FudgeCore;

@@ -11,6 +11,8 @@ namespace LaserLeague {
   async function start(_event: CustomEvent): Promise<void> {
     viewport = _event.detail;
 
+    //Hud.start();
+
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     graph = viewport.getBranch();
 
@@ -31,8 +33,12 @@ namespace LaserLeague {
   }
 
   function spawnAgent(): void {
-    let agent: ƒ.Node = new Agent(0, 360);
+    let agentName: string = "Agent One";
+    let agent: ƒ.Node = new Agent(agentName, 0, 360);
     graph.getChildrenByName("Agents")[0].addChild(agent);
+    let domName: HTMLHeadingElement = document.querySelector("#Hud > h1");
+    domName.textContent = agentName;
+    let domHealthbar: HTMLInputElement = document.querySelector("#Hud > input");
   }
 
   async function spawnLasers(): Promise<void> {

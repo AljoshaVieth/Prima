@@ -2,14 +2,17 @@ namespace LaserLeague {
     import ƒ = FudgeCore;
 
     export class Agent extends ƒ.Node {
+        public health: number = 1;
+        public name: string = "Agent Smith";
         mesh: ƒ.Node;
         ctrForward: ƒ.Control;
         speed: number; //TODO crate logic
         rotationSpeed: number;
         private deltaTime: number;
 
-        constructor(speed: number, rotationSpeed: number) {
+        constructor(name:string, speed: number, rotationSpeed: number) {
             super("Agent");
+            this.name = name;
             this.rotationSpeed = rotationSpeed;
             this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, ƒ.CONTROL_TYPE.PROPORTIONAL);
             this.ctrForward.setDelay(200);

@@ -3,13 +3,16 @@ var LaserLeague;
 (function (LaserLeague) {
     var ƒ = FudgeCore;
     class Agent extends ƒ.Node {
-        constructor(speed, rotationSpeed) {
+        constructor(name, speed, rotationSpeed) {
             super("Agent");
+            this.health = 1;
+            this.name = "Agent Smith";
             this.update = (_event) => {
                 this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
                 this.handleAgentMovement();
                 this.handleAgentRotation();
             };
+            this.name = name;
             this.rotationSpeed = rotationSpeed;
             this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
             this.ctrForward.setDelay(200);
@@ -78,6 +81,28 @@ var LaserLeague;
 var LaserLeague;
 (function (LaserLeague) {
     var ƒ = FudgeCore;
+    var ƒui = FudgeUserInterface; //TODO validate link to Fudge
+    class GameState extends ƒ.Mutable {
+        constructor() {
+            super(...arguments);
+            this.hits = 0;
+        }
+        reduceMutator(_mutator) { }
+    }
+    LaserLeague.gameState = new GameState();
+    class Hud {
+        static start() {
+            console.log("------------------- HUD started");
+            let domHud = document.querySelector("#Hud");
+            Hud.controller = new ƒui.Controller(LaserLeague.gameState, domHud);
+            Hud.controller.updateUserInterface();
+        }
+    }
+    LaserLeague.Hud = Hud;
+})(LaserLeague || (LaserLeague = {}));
+var LaserLeague;
+(function (LaserLeague) {
+    var ƒ = FudgeCore;
     class Laser {
         constructor(mesh, rotationSpeed) {
             this.mesh = mesh;
@@ -106,6 +131,7 @@ var LaserLeague;
     let graph;
     async function start(_event) {
         viewport = _event.detail;
+        //Hud.start();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         graph = viewport.getBranch();
         spawnLasers();
@@ -121,8 +147,12 @@ var LaserLeague;
         ƒ.AudioManager.default.update();
     }
     function spawnAgent() {
-        let agent = new LaserLeague.Agent(0, 360);
+        let agentName = "Agent One";
+        let agent = new LaserLeague.Agent(agentName, 0, 360);
         graph.getChildrenByName("Agents")[0].addChild(agent);
+        let domName = document.querySelector("#Hud > h1");
+        domName.textContent = agentName;
+        let domHealthbar = document.querySelector("#Hud > input");
     }
     async function spawnLasers() {
         let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:10:15.078Z|49171"];
