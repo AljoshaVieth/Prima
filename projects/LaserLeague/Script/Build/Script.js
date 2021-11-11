@@ -3,15 +3,15 @@ var LaserLeague;
 (function (LaserLeague) {
     var ƒ = FudgeCore;
     class Agent extends ƒ.Node {
+        health = 1;
+        name = "Agent Smith";
+        mesh;
+        ctrForward;
+        speed; //TODO crate logic
+        rotationSpeed;
+        deltaTime;
         constructor(name, speed, rotationSpeed) {
             super("Agent");
-            this.health = 1;
-            this.name = "Agent Smith";
-            this.update = (_event) => {
-                this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
-                this.handleAgentMovement();
-                this.handleAgentRotation();
-            };
             this.name = name;
             this.rotationSpeed = rotationSpeed;
             this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
@@ -29,6 +29,11 @@ var LaserLeague;
             //set scale
             this.mtxLocal.scale(ƒ.Vector3.ONE(0.5));
         }
+        update = (_event) => {
+            this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
+            this.handleAgentMovement();
+            this.handleAgentRotation();
+        };
         handleAgentMovement() {
             let inputValue = (ƒ.Keyboard.mapToValue(-5, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
                 + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
@@ -50,22 +55,12 @@ var LaserLeague;
     var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(LaserLeague); // Register the namespace to FUDGE for serialization
     class CustomComponentScript extends ƒ.ComponentScript {
+        // Register the script as component for use in the editor via drag&drop
+        static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
+        // Properties may be mutated by users in the editor via the automatically created user interface
+        message = "CustomComponentScript added to ";
         constructor() {
             super();
-            // Properties may be mutated by users in the editor via the automatically created user interface
-            this.message = "CustomComponentScript added to ";
-            // Activate the functions of this component as response to events
-            this.hndEvent = (_event) => {
-                switch (_event.type) {
-                    case "componentAdd" /* COMPONENT_ADD */:
-                        ƒ.Debug.log(this.message, this.node);
-                        break;
-                    case "componentRemove" /* COMPONENT_REMOVE */:
-                        this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                        this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-                        break;
-                }
-            };
             // Don't start when running in editor
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
@@ -73,9 +68,19 @@ var LaserLeague;
             this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
             this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
         }
+        // Activate the functions of this component as response to events
+        hndEvent = (_event) => {
+            switch (_event.type) {
+                case "componentAdd" /* COMPONENT_ADD */:
+                    ƒ.Debug.log(this.message, this.node);
+                    break;
+                case "componentRemove" /* COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                    break;
+            }
+        };
     }
-    // Register the script as component for use in the editor via drag&drop
-    CustomComponentScript.iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
     LaserLeague.CustomComponentScript = CustomComponentScript;
 })(LaserLeague || (LaserLeague = {}));
 var LaserLeague;
@@ -83,14 +88,12 @@ var LaserLeague;
     var ƒ = FudgeCore;
     var ƒui = FudgeUserInterface; //TODO validate link to Fudge
     class GameState extends ƒ.Mutable {
-        constructor() {
-            super(...arguments);
-            this.hits = 0;
-        }
+        hits = 0;
         reduceMutator(_mutator) { }
     }
     LaserLeague.gameState = new GameState();
     class Hud {
+        static controller;
         static start() {
             console.log("------------------- HUD started");
             let domHud = document.querySelector("#Hud");
@@ -104,6 +107,11 @@ var LaserLeague;
 (function (LaserLeague) {
     var ƒ = FudgeCore;
     class Laser {
+        mesh;
+        transformMatrix;
+        ctrForward;
+        deltaTime;
+        rotationSpeed;
         constructor(mesh, rotationSpeed) {
             this.mesh = mesh;
             this.rotationSpeed = rotationSpeed;
@@ -129,13 +137,15 @@ var LaserLeague;
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
     let graph;
+    let agent;
     async function start(_event) {
         viewport = _event.detail;
-        //Hud.start();
+        LaserLeague.Hud.start();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         graph = viewport.getBranch();
         spawnLasers();
         spawnAgent();
+        graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -145,10 +155,11 @@ var LaserLeague;
         //checkCollision();
         viewport.draw();
         ƒ.AudioManager.default.update();
+        handleSound();
     }
     function spawnAgent() {
         let agentName = "Agent One";
-        let agent = new LaserLeague.Agent(agentName, 0, 360);
+        agent = new LaserLeague.Agent(agentName, 0, 360);
         graph.getChildrenByName("Agents")[0].addChild(agent);
         let domName = document.querySelector("#Hud > h1");
         domName.textContent = agentName;
@@ -162,6 +173,16 @@ var LaserLeague;
             }
             laser.mtxLocal.translateX(5 * i);
             graph.getChildrenByName("Lasers")[0].addChild(laser);
+        }
+    }
+    function handleSound() {
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]) || ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])) {
+            //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
+            graph.getComponents(ƒ.ComponentAudio)[1].volume = 50;
+        }
+        else {
+            //graph.getComponents(ƒ.ComponentAudio)[1].play(false);
+            graph.getComponents(ƒ.ComponentAudio)[1].volume = 0;
         }
     }
     /*
@@ -190,30 +211,14 @@ var LaserLeague;
     var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(LaserLeague); // Register the namespace to FUDGE for serialization
     class RotatorComponent extends ƒ.ComponentScript {
+        // Register the script as component for use in the editor via drag&drop
+        static iSubclass = ƒ.Component.registerSubclass(RotatorComponent);
+        // Properties may be mutated by users in the editor via the automatically created user interface
+        message = "RotatorComponent added to ";
+        rotationSpeed;
+        deltaTime;
         constructor() {
             super();
-            // Properties may be mutated by users in the editor via the automatically created user interface
-            this.message = "RotatorComponent added to ";
-            // Activate the functions of this component as response to events
-            this.hndEvent = (_event) => {
-                switch (_event.type) {
-                    case "componentAdd" /* COMPONENT_ADD */:
-                        ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
-                        ƒ.Debug.log(this.message, this.node);
-                        let random = new ƒ.Random();
-                        this.rotationSpeed = random.getRangeFloored(20, 200);
-                        break;
-                    case "componentRemove" /* COMPONENT_REMOVE */:
-                        this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                        this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-                        break;
-                }
-            };
-            this.update = (_event) => {
-                this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
-                this.node.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
-                // console.log("rotating " + this.rotationSpeed);
-            };
             // Don't start when running in editor
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
@@ -221,15 +226,39 @@ var LaserLeague;
             this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
             this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
         }
+        // Activate the functions of this component as response to events
+        hndEvent = (_event) => {
+            switch (_event.type) {
+                case "componentAdd" /* COMPONENT_ADD */:
+                    ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+                    ƒ.Debug.log(this.message, this.node);
+                    let random = new ƒ.Random();
+                    this.rotationSpeed = random.getRangeFloored(20, 200);
+                    break;
+                case "componentRemove" /* COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                    break;
+            }
+        };
+        update = (_event) => {
+            this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
+            this.node.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
+            // console.log("rotating " + this.rotationSpeed);
+        };
     }
-    // Register the script as component for use in the editor via drag&drop
-    RotatorComponent.iSubclass = ƒ.Component.registerSubclass(RotatorComponent);
     LaserLeague.RotatorComponent = RotatorComponent;
 })(LaserLeague || (LaserLeague = {}));
 var LaserLeague;
 (function (LaserLeague) {
     var ƒ = FudgeCore;
     class oldAgent {
+        mesh;
+        ctrForward;
+        speed;
+        transformMatrix;
+        rotationSpeed;
+        deltaTime;
         constructor(mesh, speed, rotation) {
             this.mesh = mesh;
             this.speed = speed;

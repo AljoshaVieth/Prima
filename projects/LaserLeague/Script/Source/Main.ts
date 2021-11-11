@@ -1,23 +1,27 @@
 namespace LaserLeague {
 
   import ƒ = FudgeCore;
+  
+  
   ƒ.Debug.info("Main Program Template running!")
 
   let viewport: ƒ.Viewport;
   document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
 
   let graph: ƒ.Node;
+  let agent: Agent;
 
   async function start(_event: CustomEvent): Promise<void> {
     viewport = _event.detail;
 
-    //Hud.start();
+    Hud.start();
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     graph = viewport.getBranch();
 
     spawnLasers();
     spawnAgent();
+        graph.getComponents(ƒ.ComponentAudio)[1].play(true);
 
     
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
@@ -30,11 +34,12 @@ namespace LaserLeague {
     //checkCollision();
     viewport.draw();
     ƒ.AudioManager.default.update();
+    handleSound();
   }
 
   function spawnAgent(): void {
     let agentName: string = "Agent One";
-    let agent: ƒ.Node = new Agent(agentName, 0, 360);
+    agent = new Agent(agentName, 0, 360);
     graph.getChildrenByName("Agents")[0].addChild(agent);
     let domName: HTMLHeadingElement = document.querySelector("#Hud > h1");
     domName.textContent = agentName;
@@ -51,6 +56,16 @@ namespace LaserLeague {
       graph.getChildrenByName("Lasers")[0].addChild(laser);
     }
   }
+
+  function handleSound() {
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]) || ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])){
+        //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
+        graph.getComponents(ƒ.ComponentAudio)[1].volume = 50;
+    } else {
+      //graph.getComponents(ƒ.ComponentAudio)[1].play(false);
+      graph.getComponents(ƒ.ComponentAudio)[1].volume = 0;
+    }
+}
 
   /*
   function checkCollision(): void {

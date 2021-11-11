@@ -110,10 +110,39 @@
       }
     }
   },
+  "Audio|2021-11-09T14:25:30.451Z|37865": {
+    "ƒ.Audio": {
+      "url": "Sound\\trancyvania.mp3",
+      "idResource": "Audio|2021-11-09T14:25:30.451Z|37865",
+      "name": "Sound\\trancyvania.mp3",
+      "type": "Audio"
+    }
+  },
   "Graph|2021-10-14T11:50:21.744Z|34327": {
     "ƒ.Graph": {
       "name": "Scene",
-      "components": {},
+      "components": {
+        "ComponentAudio": [
+          {
+            "ƒ.ComponentAudio": {
+              "active": false,
+              "idResource": "Audio|2021-11-09T14:25:30.451Z|37865",
+              "playing": true,
+              "loop": true,
+              "volume": 1
+            }
+          },
+          {
+            "ƒ.ComponentAudio": {
+              "active": true,
+              "idResource": "Audio|2021-11-11T13:06:52.805Z|52632",
+              "playing": false,
+              "loop": true,
+              "volume": 10
+            }
+          }
+        ]
+      },
       "children": [
         {
           "ƒ.Node": {
@@ -639,6 +668,14 @@
       ],
       "idResource": "Graph|2021-10-28T13:10:15.078Z|49171",
       "type": "Graph"
+    }
+  },
+  "Audio|2021-11-11T13:06:52.805Z|52632": {
+    "ƒ.Audio": {
+      "url": "Sound\\agent-loop.wav",
+      "idResource": "Audio|2021-11-11T13:06:52.805Z|52632",
+      "name": "Sound\\agent-loop.wav",
+      "type": "Audio"
     }
   }
 }

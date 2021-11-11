@@ -10,7 +10,7 @@ namespace LaserLeague {
         rotationSpeed: number;
         private deltaTime: number;
 
-        constructor(name:string, speed: number, rotationSpeed: number) {
+        constructor(name: string, speed: number, rotationSpeed: number) {
             super("Agent");
             this.name = name;
             this.rotationSpeed = rotationSpeed;
@@ -51,6 +51,8 @@ namespace LaserLeague {
             this.mtxLocal.translateY(this.ctrForward.getOutput());
             //console.log(this.ctrForward.getOutput())
         }
+
+        
 
         private handleAgentRotation(): void {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
