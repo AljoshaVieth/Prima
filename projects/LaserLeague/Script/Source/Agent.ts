@@ -60,6 +60,8 @@ namespace LaserLeague {
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
                 this.mtxLocal.rotateZ(-this.rotationSpeed * this.deltaTime);
         }
+
+        
     }
 
 }
