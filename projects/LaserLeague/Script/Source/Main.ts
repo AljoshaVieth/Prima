@@ -1,10 +1,7 @@
 namespace LaserLeague {
 
   import ƒ = FudgeCore;
-  
-  
   ƒ.Debug.info("Main Program Template running!")
-
 
   window.addEventListener("load", setup);
   let viewport: ƒ.Viewport;
@@ -12,32 +9,37 @@ namespace LaserLeague {
 
   let graph: ƒ.Node;
   let agent: Agent;
+  let desiredZoomLevel: number = -30;
+  let currentZoomLevel: number = -50;
+  let cmpCamera: any;
 
   async function start(_event: CustomEvent): Promise<void> {
     viewport = _event.detail;
-
     Hud.start();
-
-    document.addEventListener("click", handleMouseClick);
+    document.addEventListener("mousedown", handleMouseClick);
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     graph = viewport.getBranch();
-
     spawnLasers();
     spawnAgent();
-        graph.getComponents(ƒ.ComponentAudio)[1].play(true);
-
-    
+    graph.getComponents(ƒ.ComponentAudio)[1].play(true);
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 120);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
 
   function update(_event: Event): void {
     // ƒ.Physics.world.simulate();  // if physics is included and used
-    //laser.update();
     //checkCollision();
     viewport.draw();
     ƒ.AudioManager.default.update();
     handleSound();
+
+    //zoom in
+    if(currentZoomLevel < desiredZoomLevel) {
+      currentZoomLevel++;
+      cmpCamera.mtxPivot.translateZ(1);
+    }
+
+
   }
 
   function spawnAgent(): void {
@@ -62,46 +64,49 @@ namespace LaserLeague {
 
   function handleSound() {
     //TODO move to Agent.ts and switch from AudioComponent added in editor to AudioComponent added in code 
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]) || ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])){
-        //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
-        graph.getComponents(ƒ.ComponentAudio)[1].volume = 50;
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]) || ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])) {
+      //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
+      graph.getComponents(ƒ.ComponentAudio)[1].volume = 50;
     } else {
       //graph.getComponents(ƒ.ComponentAudio)[1].play(false);
       graph.getComponents(ƒ.ComponentAudio)[1].volume = 0;
     }
-}
+  }
 
-function handleMouseClick(_event: Event): void {
-  console.log("Clicked!");
-}
+  function handleMouseClick(_event: Event): void {
+    console.log("Clicked!");
+  }
 
-async function setup(): Promise<void> {
-  console.log("setup---------");
-  await FudgeCore.Project.loadResourcesFromHTML();
-  let graph: any = ƒ.Project.resources["Graph|2021-10-14T11:50:21.744Z|34327"];
-  console.log("graph: " + graph);
-  // setup the viewport
-  let cmpCamera = new FudgeCore.ComponentCamera();
-  let canvas = document.querySelector("canvas");
-  graph.addComponent(cmpCamera);
-  let viewport = new FudgeCore.Viewport();
-  viewport.initialize("Viewport", graph, cmpCamera, canvas);
-  FudgeCore.Debug.log("Viewport:", viewport);
-  // hide the cursor when interacting, also suppressing right-click menu
-  canvas.addEventListener("mousedown", canvas.requestPointerLock);
-  canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
-  // make the camera interactive (complex method in FudgeAid)
-  FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
-  // setup audio
-  let cmpListener = new ƒ.ComponentAudioListener();
-  cmpCamera.node.addComponent(cmpListener);
-  FudgeCore.AudioManager.default.listenWith(cmpListener);
-  FudgeCore.AudioManager.default.listenTo(graph);
-  FudgeCore.Debug.log("Audio:", FudgeCore.AudioManager.default);
-  // draw viewport once for immediate feedback
-  viewport.draw();
-  canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
-}
+  async function setup(): Promise<void> {
+    console.log("setting up...");
+    await FudgeCore.Project.loadResourcesFromHTML();
+    let graph: any = ƒ.Project.resources["Graph|2021-10-14T11:50:21.744Z|34327"];
+    // setup the viewport
+    cmpCamera = new FudgeCore.ComponentCamera();
+    cmpCamera.mtxPivot.rotateY(180);
+    cmpCamera.mtxPivot.translateZ(currentZoomLevel);
+
+
+    let canvas = document.querySelector("canvas");
+    graph.addComponent(cmpCamera);
+    let viewport = new FudgeCore.Viewport();
+    viewport.initialize("Viewport", graph, cmpCamera, canvas);
+    FudgeCore.Debug.log("Viewport:", viewport);
+    // hide the cursor when interacting, also suppressing right-click menu
+    //canvas.addEventListener("mousedown", canvas.requestPointerLock);
+    //canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
+    // make the camera interactive (complex method in FudgeAid)
+    //FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
+    // setup audio
+    let cmpListener = new ƒ.ComponentAudioListener();
+    cmpCamera.node.addComponent(cmpListener);
+    FudgeCore.AudioManager.default.listenWith(cmpListener);
+    FudgeCore.AudioManager.default.listenTo(graph);
+    FudgeCore.Debug.log("Audio:", FudgeCore.AudioManager.default);
+    // draw viewport once for immediate feedback
+    viewport.draw();
+    canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
+  }
 
 
   /*

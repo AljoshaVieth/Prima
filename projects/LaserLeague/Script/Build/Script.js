@@ -95,7 +95,7 @@ var LaserLeague;
     class Hud {
         static controller;
         static start() {
-            console.log("------------------- HUD started");
+            console.log("HUD started");
             let domHud = document.querySelector("#Hud");
             Hud.controller = new ƒui.Controller(LaserLeague.gameState, domHud);
             Hud.controller.updateUserInterface();
@@ -139,10 +139,13 @@ var LaserLeague;
     document.addEventListener("interactiveViewportStarted", start);
     let graph;
     let agent;
+    let desiredZoomLevel = -30;
+    let currentZoomLevel = -50;
+    let cmpCamera;
     async function start(_event) {
         viewport = _event.detail;
         LaserLeague.Hud.start();
-        document.addEventListener("click", handleMouseClick);
+        document.addEventListener("mousedown", handleMouseClick);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         graph = viewport.getBranch();
         spawnLasers();
@@ -153,11 +156,15 @@ var LaserLeague;
     }
     function update(_event) {
         // ƒ.Physics.world.simulate();  // if physics is included and used
-        //laser.update();
         //checkCollision();
         viewport.draw();
         ƒ.AudioManager.default.update();
         handleSound();
+        //zoom in
+        if (currentZoomLevel < desiredZoomLevel) {
+            currentZoomLevel++;
+            cmpCamera.mtxPivot.translateZ(1);
+        }
     }
     function spawnAgent() {
         let agentName = "Agent One";
@@ -192,22 +199,23 @@ var LaserLeague;
         console.log("Clicked!");
     }
     async function setup() {
-        console.log("setup---------");
+        console.log("setting up...");
         await FudgeCore.Project.loadResourcesFromHTML();
         let graph = ƒ.Project.resources["Graph|2021-10-14T11:50:21.744Z|34327"];
-        console.log("graph: " + graph);
         // setup the viewport
-        let cmpCamera = new FudgeCore.ComponentCamera();
+        cmpCamera = new FudgeCore.ComponentCamera();
+        cmpCamera.mtxPivot.rotateY(180);
+        cmpCamera.mtxPivot.translateZ(currentZoomLevel);
         let canvas = document.querySelector("canvas");
         graph.addComponent(cmpCamera);
         let viewport = new FudgeCore.Viewport();
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
         FudgeCore.Debug.log("Viewport:", viewport);
         // hide the cursor when interacting, also suppressing right-click menu
-        canvas.addEventListener("mousedown", canvas.requestPointerLock);
-        canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
+        //canvas.addEventListener("mousedown", canvas.requestPointerLock);
+        //canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
         // make the camera interactive (complex method in FudgeAid)
-        FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
+        //FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
         // setup audio
         let cmpListener = new ƒ.ComponentAudioListener();
         cmpCamera.node.addComponent(cmpListener);

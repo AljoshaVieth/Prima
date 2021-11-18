@@ -13,7 +13,7 @@ namespace LaserLeague {
       private static controller: ƒui.Controller;
   
       public static start(): void {
-        console.log("------------------- HUD started");
+        console.log("HUD started");
         let domHud: HTMLDivElement = document.querySelector("#Hud");
         Hud.controller = new ƒui.Controller(gameState, domHud);
         Hud.controller.updateUserInterface();
