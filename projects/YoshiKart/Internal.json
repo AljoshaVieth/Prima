@@ -36,7 +36,7 @@
       "coat": {
         "ƒ.CoatTextured": {
           "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2021-11-23T14:02:51.682Z|36553"
+          "idTexture": "TextureImage|2021-11-23T14:32:08.010Z|32338"
         }
       }
     }
@@ -217,6 +217,28 @@
       "name": "MeshRelief",
       "type": "MeshRelief",
       "idTexture": "TextureImage|2021-11-23T13:45:54.433Z|45330"
+    }
+  },
+  "TextureImage|2021-11-23T14:32:08.010Z|32338": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\sand.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2021-11-23T14:32:08.010Z|32338",
+        "name": "Textures\\sand.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "TextureImage|2021-11-23T14:33:31.118Z|92336": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\sand-blurred.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2021-11-23T14:33:31.118Z|92336",
+        "name": "Textures\\sand-blurred.png",
+        "mipmap": "CRISP"
+      }
     }
   }
 }
