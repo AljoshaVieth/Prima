@@ -4,6 +4,7 @@ namespace Script {
 
   let viewport: ƒ.Viewport;
   let kart: ƒ.Node;
+  let meshTerrain: ƒ.MeshTerrain;
 
 
 
@@ -23,6 +24,9 @@ namespace Script {
     console.log(viewport);
     console.log(viewport.getBranch());
     kart = viewport.getBranch().getChildrenByName("Kart")[0];
+//TODO Add code from jirka to enable kart staying on top of terrain
+    let cmpMeshTerrain: ƒ.ComponentMesh = viewport.getBranch().getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh);
+    meshTerrain = <ƒ.MeshTerrain>cmpMeshTerrain.mesh;
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
      ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a

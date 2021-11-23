@@ -38,6 +38,7 @@ var Script;
     ƒ.Debug.info("Main Program Template running!");
     let viewport;
     let kart;
+    let meshTerrain;
     document.addEventListener("interactiveViewportStarted", start);
     let ctrForward = new ƒ.Control("Forward", 10, 0 /* PROPORTIONAL */);
     ctrForward.setDelay(200);
@@ -50,6 +51,9 @@ var Script;
         console.log(viewport);
         console.log(viewport.getBranch());
         kart = viewport.getBranch().getChildrenByName("Kart")[0];
+        //TODO Add code from jirka to enable kart staying on top of terrain
+        let cmpMeshTerrain = viewport.getBranch().getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh);
+        meshTerrain = cmpMeshTerrain.mesh;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
