@@ -5,6 +5,7 @@ namespace Script {
   let viewport: ƒ.Viewport;
   let kart: ƒ.Node;
   let meshTerrain: ƒ.MeshTerrain;
+  let mtxTerrain: ƒ.Matrix4x4;
 
 
 
@@ -27,6 +28,7 @@ namespace Script {
 //TODO Add code from jirka to enable kart staying on top of terrain
     let cmpMeshTerrain: ƒ.ComponentMesh = viewport.getBranch().getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh);
     meshTerrain = <ƒ.MeshTerrain>cmpMeshTerrain.mesh;
+    mtxTerrain = cmpMeshTerrain.mtxWorld;
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
      ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -43,6 +45,11 @@ namespace Script {
     let forward: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]);
     ctrForward.setInput(forward * deltaTime);
     kart.mtxLocal.translateZ(ctrForward.getOutput());
+
+    let terrainInfo: ƒ.TerrainInfo = meshTerrain.getTerrainInfo(kart.mtxLocal.translation, mtxTerrain);
+    kart.mtxLocal.translation = terrainInfo.position;
+    kart.mtxLocal.showTo(ƒ.Vector3.SUM(terrainInfo.position, kart.mtxLocal.getZ()), terrainInfo.normal);
+
 
     viewport.draw();
     ƒ.AudioManager.default.update();

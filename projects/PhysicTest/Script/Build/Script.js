@@ -37,40 +37,26 @@ var Script;
     var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
     let viewport;
-    let kart;
-    let meshTerrain;
-    let mtxTerrain;
+    let body;
     document.addEventListener("interactiveViewportStarted", start);
-    let ctrForward = new ƒ.Control("Forward", 10, 0 /* PROPORTIONAL */);
-    ctrForward.setDelay(200);
-    let ctrTurn = new ƒ.Control("Turn", 100, 0 /* PROPORTIONAL */);
-    ctrForward.setDelay(50);
+    let ctrForward = new ƒ.Control("Forward", 30, 0 /* PROPORTIONAL */);
+    let ctrTurn = new ƒ.Control("Turn", 10, 0 /* PROPORTIONAL */);
     function start(_event) {
-        console.log("starting...");
         viewport = _event.detail;
-        viewport.calculateTransforms();
-        console.log(viewport);
-        console.log(viewport.getBranch());
-        kart = viewport.getBranch().getChildrenByName("Kart")[0];
-        //TODO Add code from jirka to enable kart staying on top of terrain
-        let cmpMeshTerrain = viewport.getBranch().getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh);
-        meshTerrain = cmpMeshTerrain.mesh;
-        mtxTerrain = cmpMeshTerrain.mtxWorld;
+        let graph = viewport.getBranch();
+        body = graph.getChildrenByName("Cube")[0].getComponent(ƒ.ComponentRigidbody);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        // ƒ.Physics.world.simulate();  // if physics is included and used
         let deltaTime = ƒ.Loop.timeFrameReal / 1000;
         let turn = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]);
-        ctrTurn.setInput(turn * deltaTime);
-        kart.mtxLocal.rotateY(ctrTurn.getOutput());
+        ctrTurn.setInput(turn);
+        body.applyTorque(ƒ.Vector3.SCALE(ƒ.Vector3.Y(), ctrTurn.getOutput()));
         let forward = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]);
-        ctrForward.setInput(forward * deltaTime);
-        kart.mtxLocal.translateZ(ctrForward.getOutput());
-        let terrainInfo = meshTerrain.getTerrainInfo(kart.mtxLocal.translation, mtxTerrain);
-        kart.mtxLocal.translation = terrainInfo.position;
-        kart.mtxLocal.showTo(ƒ.Vector3.SUM(terrainInfo.position, kart.mtxLocal.getZ()), terrainInfo.normal);
+        ctrForward.setInput(forward);
+        body.applyForce(ƒ.Vector3.SCALE(body.node.mtxLocal.getZ(), ctrForward.getOutput()));
+        ƒ.Physics.world.simulate(); // if physics is included and used
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
