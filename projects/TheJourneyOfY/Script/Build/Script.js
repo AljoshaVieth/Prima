@@ -56,13 +56,13 @@ var TheYourneyOfY;
         console.log(viewport);
         console.log(graph);
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
+        spawnPlayer();
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         // ƒ.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
-        spawnPlayer();
         //zoom in
         f.Debug.info("update loop");
         if (currentZoomLevel < desiredZoomLevel) {
@@ -100,6 +100,7 @@ var TheYourneyOfY;
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     }
     function spawnPlayer() {
+        console.log("Spawing player!!!");
         player = new TheYourneyOfY.Player("name", 0, 360);
         graph.getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(player);
     }
