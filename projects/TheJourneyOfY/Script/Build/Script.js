@@ -36,10 +36,10 @@ var Script;
     }
     Script.CustomComponentScript = CustomComponentScript;
 })(Script || (Script = {}));
-var Script;
-(function (Script) {
-    var ƒ = FudgeCore;
-    ƒ.Debug.info("Main Program Template running!");
+var TheYourneyOfY;
+(function (TheYourneyOfY) {
+    var f = FudgeCore;
+    f.Debug.info("Main Program Template running!");
     window.addEventListener("load", setup);
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
@@ -48,28 +48,33 @@ var Script;
     let currentZoomLevel = -80;
     let cmpCamera;
     let graphId = "Graph|2022-01-08T12:51:22.101Z|15244";
+    let player;
     function start(_event) {
+        console.log("Starting...");
         viewport = _event.detail;
         graph = viewport.getBranch();
+        console.log(viewport);
+        console.log(graph);
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
-        ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+        f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
+        f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         // ƒ.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
+        spawnPlayer();
         //zoom in
-        ƒ.Debug.info("update loop");
+        f.Debug.info("update loop");
         if (currentZoomLevel < desiredZoomLevel) {
             currentZoomLevel++;
             cmpCamera.mtxPivot.translateZ(1);
         }
-        ƒ.AudioManager.default.update();
+        f.AudioManager.default.update();
     }
     async function setup() {
         console.log("setting up...");
         await FudgeCore.Project.loadResourcesFromHTML();
-        let graph = ƒ.Project.resources[graphId];
+        let graph = f.Project.resources[graphId];
         // setup the viewport
         cmpCamera = new FudgeCore.ComponentCamera();
         cmpCamera.mtxPivot.rotateY(180);
@@ -85,16 +90,69 @@ var Script;
         // make the camera interactive (complex method in FudgeAid)
         //FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
         // setup audio
-        /*
-        let cmpListener = new ƒ.ComponentAudioListener();
+        let cmpListener = new f.ComponentAudioListener();
         cmpCamera.node.addComponent(cmpListener);
         FudgeCore.AudioManager.default.listenWith(cmpListener);
         FudgeCore.AudioManager.default.listenTo(graph);
         FudgeCore.Debug.log("Audio:", FudgeCore.AudioManager.default);
-         */
         // draw viewport once for immediate feedback
         viewport.draw();
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     }
-})(Script || (Script = {}));
+    function spawnPlayer() {
+        player = new TheYourneyOfY.Player("name", 0, 360);
+        graph.getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(player);
+    }
+})(TheYourneyOfY || (TheYourneyOfY = {}));
+var TheYourneyOfY;
+(function (TheYourneyOfY) {
+    var ƒ = FudgeCore;
+    class Player extends ƒ.Node {
+        health = 1;
+        name = "Agent Smith";
+        mesh;
+        ctrForward;
+        speed; //TODO crate logic
+        rotationSpeed;
+        deltaTime;
+        constructor(name, speed, rotationSpeed) {
+            super("Agent");
+            this.name = name;
+            this.rotationSpeed = rotationSpeed;
+            this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
+            this.ctrForward.setDelay(200);
+            this.initiatePositionAndScale();
+            ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+        }
+        initiatePositionAndScale() {
+            this.addComponent(new ƒ.ComponentTransform);
+            this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshQuad("MeshAgent"))); //TODO move to static variable for all agents
+            this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("mtrAgent", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(1, 0, 1, 1)))));
+            //set position
+            this.mtxLocal.translateZ(0.5);
+            this.mtxLocal.translateY(4);
+            //set scale
+            this.mtxLocal.scale(ƒ.Vector3.ONE(0.5));
+        }
+        update = (_event) => {
+            this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
+            this.handleAgentMovement();
+            this.handleAgentRotation();
+        };
+        handleAgentMovement() {
+            let inputValue = (ƒ.Keyboard.mapToValue(-5, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
+                + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
+            this.ctrForward.setInput(inputValue * this.deltaTime);
+            this.mtxLocal.translateY(this.ctrForward.getOutput());
+            //console.log(this.ctrForward.getOutput())
+        }
+        handleAgentRotation() {
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
+                this.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
+                this.mtxLocal.rotateZ(-this.rotationSpeed * this.deltaTime);
+        }
+    }
+    TheYourneyOfY.Player = Player;
+})(TheYourneyOfY || (TheYourneyOfY = {}));
 //# sourceMappingURL=Script.js.map
