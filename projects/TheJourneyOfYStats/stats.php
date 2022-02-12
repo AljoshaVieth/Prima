@@ -35,5 +35,4 @@ if (isset($_GET['mode']) && !empty($_GET['mode'])) {
     //default landing page
     echo "false arguments...";
 }
-
 ?>

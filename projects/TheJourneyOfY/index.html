@@ -1,31 +1,34 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>TheJourneyOfY</title>
-<meta charset="utf-8" />
-<link rel="stylesheet" href="styles.css" />
+    <title>TheJourneyOfY</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="styles.css"/>
 
-<!--Editor settings of this project-->
-<meta type="settings" autoview="Graph|2022-01-08T12:51:22.101Z|15244" project="{'name':'TheJourneyOfY','includeAutoViewScript':true,'graphAutoView':'Graph|2022-01-08T12:51:22.101Z|15244'}" panels="[{'type':'PanelProject','state':{}},{'type':'PanelGraph','state':{'graph':'Graph|2022-01-08T12:51:22.101Z|15244'}}]" />
+    <!--Editor settings of this project-->
+    <meta type="settings" autoview="Graph|2022-01-08T12:51:22.101Z|15244"
+          project="{'name':'TheJourneyOfY','includeAutoViewScript':true,'graphAutoView':'Graph|2022-01-08T12:51:22.101Z|15244'}"
+          panels="[{'type':'PanelProject','state':{}},{'type':'PanelGraph','state':{'graph':'Graph|2022-01-08T12:51:22.101Z|15244'}}]"/>
 
-<!--Activate the following line to include the FUDGE-version of Oimo-Physics. You may want to download a local copy to work offline and be independent from future changes!-->
-<!--<script type="text/javascript" src="../../../Physics/OimoPhysics.js"></script>-->
+    <!--Activate the following line to include the FUDGE-version of Oimo-Physics. You may want to download a local copy to work offline and be independent from future changes!-->
+    <!--<script type="text/javascript" src="../../../Physics/OimoPhysics.js"></script>-->
 
-<!--Load FUDGE. You may want to download local copies to work offline and be independent from future changes! Developers working on FUDGE itself may want to create symlinks-->
-<script type="text/javascript" src="https://jirkadelloro.github.io/FUDGE/Core/Build/FudgeCore.js"></script>
-<script type="text/javascript" src="https://jirkadelloro.github.io/FUDGE/Aid/Build/FudgeAid.js"></script>
+    <!--Load FUDGE. You may want to download local copies to work offline and be independent from future changes! Developers working on FUDGE itself may want to create symlinks-->
+    <script type="text/javascript" src="https://jirkadelloro.github.io/FUDGE/Physics/OimoPhysics.js"></script>
+    <script type="text/javascript" src="https://jirkadelloro.github.io/FUDGE/Core/Build/FudgeCore.js"></script>
+    <script type="text/javascript" src="https://jirkadelloro.github.io/FUDGE/Aid/Build/FudgeAid.js"></script>
 
-<!--Link internal resources. The editor only loads the first, but at runtime, multiple files can contribute-->
-<link type="resources" src="Internal.json" />
+    <!--Link internal resources. The editor only loads the first, but at runtime, multiple files can contribute-->
+    <link type="resources" src="Internal.json"/>
 
-<!--Load custom scripts-->
-<script type="text/javascript" src="Script/Build/Script.js" editor="true"></script>
+    <!--Load custom scripts-->
+    <script type="text/javascript" src="Script/Build/Script.js" editor="true"></script>
 </head>
 <body>
 <!--Dialog shown at startup only-->
 <dialog>
-<h1>Title (will be replaced by autoView)</h1>
-<p>click to start</p>
+    <h1>Title (will be replaced by autoView)</h1>
+    <p>click to start</p>
 </dialog>
 <!--Canvas for FUDGE to render to-->
 <canvas class="fullscreen">

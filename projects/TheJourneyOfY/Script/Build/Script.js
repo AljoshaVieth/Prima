@@ -48,6 +48,8 @@ var TheYourneyOfY;
     let currentZoomLevel = -80;
     let cmpCamera;
     let graphId = "Graph|2022-01-08T12:51:22.101Z|15244";
+    let objectSelected = false;
+    let hoveringOverObject = false;
     let player;
     function start(_event) {
         console.log("Starting...");
@@ -57,19 +59,52 @@ var TheYourneyOfY;
         console.log(graph);
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         spawnPlayer();
+        viewport.getCanvas().addEventListener("mousemove", mouseHoverObserver);
+        viewport.getCanvas().addEventListener("mousedown", mouseDownObserver);
+        viewport.getCanvas().addEventListener("mousemove", mouseMoveObserver);
+        viewport.getCanvas().addEventListener("mouseup", mouseUpObserver);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        // ƒ.Physics.world.simulate();  // if physics is included and used
+        //f.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
         //zoom in
-        f.Debug.info("update loop");
+        // f.Debug.info("update loop");
         if (currentZoomLevel < desiredZoomLevel) {
             currentZoomLevel++;
             cmpCamera.mtxPivot.translateZ(1);
         }
         f.AudioManager.default.update();
+    }
+    function mouseHoverObserver(_event) {
+        let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
+        //f.Debug.info(ray);
+        let cmpMesh = player.getComponent(f.ComponentMesh);
+        let position = cmpMesh ? cmpMesh.mtxWorld.translation : player.mtxWorld.translation;
+        if (ray.getDistance(position).magnitude < player.radius) {
+            f.Debug.info("hovering over Object!!!");
+            hoveringOverObject = true;
+        }
+        else {
+            hoveringOverObject = false;
+        }
+    }
+    function mouseDownObserver(_event) {
+        if (hoveringOverObject) {
+            objectSelected = true;
+        }
+    }
+    function mouseUpObserver(_event) {
+        objectSelected = false;
+    }
+    function mouseMoveObserver(_event) {
+        if (objectSelected) {
+            let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
+            let mousePositionOnWorld = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
+            let moveVector = f.Vector3.DIFFERENCE(mousePositionOnWorld, player.mtxLocal.translation);
+            player.getComponent(f.ComponentRigidbody).translateBody(moveVector);
+        }
     }
     async function setup() {
         console.log("setting up...");
@@ -100,15 +135,14 @@ var TheYourneyOfY;
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     }
     function spawnPlayer() {
-        console.log("Spawing player!!!");
         player = new TheYourneyOfY.Player("name", 0, 360);
         graph.getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(player);
     }
 })(TheYourneyOfY || (TheYourneyOfY = {}));
 var TheYourneyOfY;
 (function (TheYourneyOfY) {
-    var ƒ = FudgeCore;
-    class Player extends ƒ.Node {
+    var f = FudgeCore;
+    class Player extends f.Node {
         health = 1;
         name = "Agent Smith";
         mesh;
@@ -120,37 +154,40 @@ var TheYourneyOfY;
             super("Agent");
             this.name = name;
             this.rotationSpeed = rotationSpeed;
-            this.ctrForward = this.ctrForward = new ƒ.Control("Forward", 1, 0 /* PROPORTIONAL */);
+            this.ctrForward = this.ctrForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
             this.ctrForward.setDelay(200);
             this.initiatePositionAndScale();
-            ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         }
         initiatePositionAndScale() {
-            this.addComponent(new ƒ.ComponentTransform);
-            this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshQuad("MeshAgent"))); //TODO move to static variable for all agents
-            this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("mtrAgent", ƒ.ShaderUniColor, new ƒ.CoatColored(new ƒ.Color(1, 0, 1, 1)))));
+            this.addComponent(new f.ComponentTransform);
+            this.addComponent(new f.ComponentMesh(new f.MeshCube("Player"))); //TODO move to static variable for all agents
+            this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1)))));
+            this.addComponent(new f.ComponentRigidbody());
+            this.getComponent(f.ComponentRigidbody).effectGravity = 0;
             //set position
-            this.mtxLocal.translateZ(0.5);
+            this.mtxLocal.translateZ(0);
             this.mtxLocal.translateY(4);
+            this.mtxLocal.translateX(5);
             //set scale
-            this.mtxLocal.scale(ƒ.Vector3.ONE(0.5));
+            this.mtxLocal.scale(f.Vector3.ONE(0.5));
         }
         update = (_event) => {
-            this.deltaTime = ƒ.Loop.timeFrameReal / 1000;
+            this.deltaTime = f.Loop.timeFrameReal / 1000;
             this.handleAgentMovement();
             this.handleAgentRotation();
         };
         handleAgentMovement() {
-            let inputValue = (ƒ.Keyboard.mapToValue(-5, 0, [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
-                + ƒ.Keyboard.mapToValue(5, 0, [ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]));
+            let inputValue = (f.Keyboard.mapToValue(-5, 0, [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN])
+                + f.Keyboard.mapToValue(5, 0, [f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP]));
             this.ctrForward.setInput(inputValue * this.deltaTime);
             this.mtxLocal.translateY(this.ctrForward.getOutput());
             //console.log(this.ctrForward.getOutput())
         }
         handleAgentRotation() {
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
+            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]))
                 this.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
-            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
+            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT]))
                 this.mtxLocal.rotateZ(-this.rotationSpeed * this.deltaTime);
         }
     }
