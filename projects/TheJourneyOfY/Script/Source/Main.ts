@@ -1,6 +1,5 @@
 namespace TheYourneyOfY {
     import f = FudgeCore;
-    import Vector3 = FudgeCore.Vector3;
     f.Debug.info("Main Program Template running!");
 
     window.addEventListener("load", setup);
@@ -13,8 +12,11 @@ namespace TheYourneyOfY {
     let cmpCamera: any;
     let graphId: string = "Graph|2022-01-08T12:51:22.101Z|15244";
     let objectSelected: boolean = false;
-    let hoveringOverObject: boolean = false;
+    let hoveringOverControllableObject: boolean = false;
     let player: Player;
+    let controllableObjects: f.Node;
+    let hoveredObject: f.Node = null;
+    let controlledObject: f.Node = null;
 
 
     function start(_event: CustomEvent): void {
@@ -23,6 +25,17 @@ namespace TheYourneyOfY {
         graph = viewport.getBranch();
         console.log(viewport);
         console.log(graph);
+
+
+        controllableObjects = graph.getChildrenByName("Level")[0]
+            .getChildrenByName("Surroundings")[0]
+            .getChildrenByName("Foreground")[0]
+            .getChildrenByName("Movables")[0]
+            .getChildrenByName("Controllables")[0];
+        f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
+
+
+
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         spawnPlayer();
 
@@ -37,7 +50,7 @@ namespace TheYourneyOfY {
     }
 
     function update(_event: Event): void {
-        //f.Physics.world.simulate();  // if physics is included and used
+        f.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
         //zoom in
         // f.Debug.info("update loop");
@@ -49,34 +62,46 @@ namespace TheYourneyOfY {
     }
 
     function mouseHoverObserver(_event: MouseEvent): void {
-        let ray: f.Ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
-        //f.Debug.info(ray);
-        let cmpMesh: f.ComponentMesh = player.getComponent(f.ComponentMesh);
-        let position: f.Vector3 = cmpMesh ? cmpMesh.mtxWorld.translation : player.mtxWorld.translation;
-        if (ray.getDistance(position).magnitude < player.radius) {
-            f.Debug.info("hovering over Object!!!");
-            hoveringOverObject = true;
-        } else {
-            hoveringOverObject = false;
+        if(!objectSelected){
+            let ray: f.Ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
+            for(let controllableObject of controllableObjects.getIterator()){
+                if(controllableObject.name == "Controllables"){
+                    continue; //ignoring parent object since it cannot be moved and causes problems otherwise
+                }
+                let componentMesh: f.ComponentMesh = controllableObject.getComponent(f.ComponentMesh);
+                let position: f.Vector3 = componentMesh ? componentMesh.mtxWorld.translation : controllableObject.mtxWorld.translation;
+                if (ray.getDistance(position).magnitude < controllableObject.radius) {
+                    //f.Debug.info("hovering over controllable object named: " + controllableObject.name);
+                    hoveringOverControllableObject = true;
+                    hoveredObject = controllableObject;
+                    break; //ignoring other controllable objects. There can only be one.
+                } else {
+                    hoveringOverControllableObject = false;
+                }
+            }
         }
     }
 
     function mouseDownObserver(_event: MouseEvent): void {
-        if (hoveringOverObject) {
+        if (hoveringOverControllableObject) {
             objectSelected = true;
+            controlledObject = hoveredObject;
+            //f.Debug.info("Clicked controllable object named: " + controlledObject.name);
         }
     }
 
     function mouseUpObserver(_event: MouseEvent): void {
         objectSelected = false;
+        hoveredObject = null;
+        controlledObject = null;
     }
 
     function mouseMoveObserver(_event: MouseEvent): void {
         if (objectSelected) {
             let ray: f.Ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
             let mousePositionOnWorld: f.Vector3 = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
-            let moveVector: f.Vector3 = f.Vector3.DIFFERENCE(mousePositionOnWorld, player.mtxLocal.translation);
-            player.getComponent(f.ComponentRigidbody).translateBody(moveVector);
+            let moveVector: f.Vector3 = f.Vector3.DIFFERENCE(mousePositionOnWorld, controlledObject.mtxLocal.translation);
+            controlledObject.getComponent(f.ComponentRigidbody).translateBody(moveVector);
         }
     }
 
