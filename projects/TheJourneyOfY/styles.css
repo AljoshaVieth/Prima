@@ -14,3 +14,10 @@ canvas.fullscreen {
   width: 100vw; 
   height: 100vh; 
 }
+
+.grayscale {
+  -webkit-filter: grayscale(50%);
+  -moz-filter: grayscale(50%);
+  -ms-filter: grayscale(50%);
+  filter: grayscale(50%);
+}

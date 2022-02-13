@@ -56,7 +56,11 @@ var TheYourneyOfY;
     let borderObjects;
     let hoveredObject = null;
     let controlledObject = null;
+    let swoshSound;
+    let activatePhysics = true;
+    let body;
     function start(_event) {
+        body = document.getElementsByTagName('body')[0];
         console.log("Starting...");
         viewport = _event.detail;
         graph = viewport.getBranch();
@@ -72,6 +76,9 @@ var TheYourneyOfY;
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Non-Movables")[0]
             .getChildrenByName("MovementBorder")[0];
+        swoshSound = graph.getChildrenByName("Level")[0]
+            .getChildrenByName("Sounds")[0]
+            .getChildrenByName("swosh")[0];
         f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         spawnPlayer();
@@ -84,7 +91,9 @@ var TheYourneyOfY;
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        f.Physics.world.simulate(); // if physics is included and used
+        if (activatePhysics) {
+            f.Physics.world.simulate(); // if physics is included and used
+        }
         viewport.draw();
         //zoom in
         // f.Debug.info("update loop");
@@ -135,15 +144,17 @@ var TheYourneyOfY;
     }
     function mouseDownHandler(_event) {
         if (hoveringOverControllableObject) {
+            swoshSound.getComponents(f.ComponentAudio)[0].play(true);
+            activatePhysics = false;
+            body.classList.add("grayscale"); //add the class
             objectSelected = true;
             controlledObject = hoveredObject;
+            /*
+            // not needed anymore cause physics gets disabled completely
             controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 0;
-            //trying to stop rotation
-            controlledObject.getComponent(f.ComponentRigidbody).setRotation(new f.Vector3(0, 0, 0));
-            controlledObject.getComponent(f.ComponentRigidbody).setVelocity(new f.Vector3(0, 0, 0));
-            controlledObject.getComponent(f.ComponentRigidbody).applyTorque(new f.Vector3(0, 0, 0));
-            controlledObject.mtxWorld.rotate(new f.Vector3(0, 0, 0));
-            //f.Debug.info("Clicked controllable object named: " + controlledObject.name);
+            //stopping rotation
+            controlledObject.getComponent(f.ComponentRigidbody).effectRotation = new f.Vector3(0, 0, 0);
+             */
         }
     }
     function mouseUpHandler(_event) {
@@ -157,9 +168,6 @@ var TheYourneyOfY;
             let mousePositionOnWorld = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
             let moveVector = f.Vector3.DIFFERENCE(mousePositionOnWorld, controlledObject.mtxLocal.translation);
             controlledObject.getComponent(f.ComponentRigidbody).translateBody(moveVector);
-            controlledObject.getComponent(f.ComponentRigidbody).getPosition().z = 0;
-            controlledObject.getComponent(f.ComponentRigidbody).getAngularVelocity().z = 0;
-            controlledObject.getComponent(f.ComponentRigidbody).getRotation().z = 0;
         }
     }
     function scrollHandler(_event) {
@@ -168,7 +176,10 @@ var TheYourneyOfY;
         }
     }
     function releaseObject() {
+        activatePhysics = true;
+        body.classList.remove("grayscale"); //remove the class
         controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 1;
+        controlledObject.getComponent(f.ComponentRigidbody).effectRotation = new f.Vector3(0, 0, 1);
         //controlledObject.getComponent(f.ComponentRigidbody).translateBody(currentPosition);
         objectSelected = false;
         hoveredObject = null;
@@ -203,7 +214,7 @@ var TheYourneyOfY;
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     }
     function spawnPlayer() {
-        player = new TheYourneyOfY.Player("name", 0, 360);
+        player = new TheYourneyOfY.Player();
         graph.getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(player);
     }
 })(TheYourneyOfY || (TheYourneyOfY = {}));

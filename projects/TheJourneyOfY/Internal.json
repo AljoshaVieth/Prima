@@ -150,7 +150,7 @@
                                                   "pivot": {
                                                     "translation": "[0, 0, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[1, 1, 1]"
+                                                    "scaling": "[2, 1, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -698,15 +698,40 @@
                                   "ƒ.Node": {
                                     "name": "MovementBorder",
                                     "components": {},
-                                    "children": [
-
-                                    ]
+                                    "children": []
                                   }
                                 }
                               ]
                             }
                           }
                         ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "Sounds",
+                  "components": {},
+                  "children": [
+                    {
+                      "ƒ.Node": {
+                        "name": "swosh",
+                        "components": {
+                          "ComponentAudio": [
+                            {
+                              "ƒ.ComponentAudio": {
+                                "active": true,
+                                "idResource": "Audio|2022-02-13T21:42:49.706Z|86540",
+                                "playing": false,
+                                "loop": false,
+                                "volume": 1
+                              }
+                            }
+                          ]
+                        },
+                        "children": []
                       }
                     }
                   ]
@@ -718,6 +743,14 @@
       ],
       "idResource": "Graph|2022-01-08T12:51:22.101Z|15244",
       "type": "Graph"
+    }
+  },
+  "Audio|2022-02-13T21:42:49.706Z|86540": {
+    "ƒ.Audio": {
+      "url": "Sounds\\swosh.wav",
+      "idResource": "Audio|2022-02-13T21:42:49.706Z|86540",
+      "name": "Sounds\\swosh.wav",
+      "type": "Audio"
     }
   }
 }
