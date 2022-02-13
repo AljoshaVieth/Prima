@@ -15,6 +15,7 @@ namespace TheYourneyOfY {
     let hoveringOverControllableObject: boolean = false;
     let player: Player;
     let controllableObjects: f.Node;
+    let borderObjects: f.Node;
     let hoveredObject: f.Node = null;
     let controlledObject: f.Node = null;
 
@@ -32,8 +33,15 @@ namespace TheYourneyOfY {
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Movables")[0]
             .getChildrenByName("Controllables")[0];
-        f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
 
+        borderObjects = graph.getChildrenByName("Level")[0]
+            .getChildrenByName("Surroundings")[0]
+            .getChildrenByName("Foreground")[0]
+            .getChildrenByName("Non-Movables")[0]
+            .getChildrenByName("MovementBorder")[0];
+
+
+        f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
 
 
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
@@ -52,6 +60,7 @@ namespace TheYourneyOfY {
     function update(_event: Event): void {
         f.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
+
         //zoom in
         // f.Debug.info("update loop");
         if (currentZoomLevel < desiredZoomLevel) {
@@ -62,16 +71,17 @@ namespace TheYourneyOfY {
     }
 
     function mouseHoverObserver(_event: MouseEvent): void {
-        if(!objectSelected){
-            let ray: f.Ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
-            for(let controllableObject of controllableObjects.getIterator()){
-                if(controllableObject.name == "Controllables"){
+        let ray: f.Ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
+        if (!objectSelected) {
+            f.Debug.info("No object selected");
+            for (let controllableObject of controllableObjects.getIterator()) {
+                if (controllableObject.name == "Controllables") {
                     continue; //ignoring parent object since it cannot be moved and causes problems otherwise
                 }
                 let componentMesh: f.ComponentMesh = controllableObject.getComponent(f.ComponentMesh);
                 let position: f.Vector3 = componentMesh ? componentMesh.mtxWorld.translation : controllableObject.mtxWorld.translation;
                 if (ray.getDistance(position).magnitude < controllableObject.radius) {
-                    //f.Debug.info("hovering over controllable object named: " + controllableObject.name);
+                    f.Debug.info("hovering over controllable object named: " + controllableObject.name);
                     hoveringOverControllableObject = true;
                     hoveredObject = controllableObject;
                     break; //ignoring other controllable objects. There can only be one.
@@ -79,21 +89,45 @@ namespace TheYourneyOfY {
                     hoveringOverControllableObject = false;
                 }
             }
+        } else {
+            /*
+            for (let borderObject of borderObjects.getIterator()) {
+                if (borderObject.name == "MovementBorder") {
+                    continue; //ignoring parent object since it is not relevant and causes problems otherwise
+                }
+                let componentMesh: f.ComponentMesh = borderObject.getComponent(f.ComponentMesh);
+                let position: f.Vector3 = componentMesh ? componentMesh.mtxWorld.translation : borderObject.mtxWorld.translation;
+                if (ray.getDistance(position).magnitude < borderObject.radius) {
+                    f.Debug.info("Hovering over " + borderObject.name + "! releasing object...");
+                    releaseObject();
+                    break; //ignoring other controllable objects. There can only be one.
+                }
+            }
+
+             */
         }
+
     }
 
     function mouseDownObserver(_event: MouseEvent): void {
         if (hoveringOverControllableObject) {
             objectSelected = true;
             controlledObject = hoveredObject;
+            controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 0;
+            //trying to stop rotation
+            controlledObject.getComponent(f.ComponentRigidbody).setRotation(new f.Vector3(0, 0, 0));
+            controlledObject.getComponent(f.ComponentRigidbody).setVelocity(new f.Vector3(0, 0, 0));
+            controlledObject.getComponent(f.ComponentRigidbody).applyTorque(new f.Vector3(0, 0, 0));
+            controlledObject.mtxWorld.rotate(new f.Vector3(0, 0, 0));
+
             //f.Debug.info("Clicked controllable object named: " + controlledObject.name);
         }
     }
 
     function mouseUpObserver(_event: MouseEvent): void {
-        objectSelected = false;
-        hoveredObject = null;
-        controlledObject = null;
+        if (objectSelected) {
+            releaseObject();
+        }
     }
 
     function mouseMoveObserver(_event: MouseEvent): void {
@@ -102,7 +136,19 @@ namespace TheYourneyOfY {
             let mousePositionOnWorld: f.Vector3 = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
             let moveVector: f.Vector3 = f.Vector3.DIFFERENCE(mousePositionOnWorld, controlledObject.mtxLocal.translation);
             controlledObject.getComponent(f.ComponentRigidbody).translateBody(moveVector);
+            controlledObject.getComponent(f.ComponentRigidbody).getPosition().z = 0;
+            controlledObject.getComponent(f.ComponentRigidbody).getAngularVelocity().z = 0;
+            controlledObject.getComponent(f.ComponentRigidbody).getRotation().z = 0;
+
         }
+    }
+
+    function releaseObject() {
+        controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 1;
+        //controlledObject.getComponent(f.ComponentRigidbody).translateBody(currentPosition);
+        objectSelected = false;
+        hoveredObject = null;
+        controlledObject = null;
     }
 
 

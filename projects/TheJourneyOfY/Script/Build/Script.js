@@ -52,6 +52,7 @@ var TheYourneyOfY;
     let hoveringOverControllableObject = false;
     let player;
     let controllableObjects;
+    let borderObjects;
     let hoveredObject = null;
     let controlledObject = null;
     function start(_event) {
@@ -65,6 +66,11 @@ var TheYourneyOfY;
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Movables")[0]
             .getChildrenByName("Controllables")[0];
+        borderObjects = graph.getChildrenByName("Level")[0]
+            .getChildrenByName("Surroundings")[0]
+            .getChildrenByName("Foreground")[0]
+            .getChildrenByName("Non-Movables")[0]
+            .getChildrenByName("MovementBorder")[0];
         f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         spawnPlayer();
@@ -87,8 +93,9 @@ var TheYourneyOfY;
         f.AudioManager.default.update();
     }
     function mouseHoverObserver(_event) {
+        let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
         if (!objectSelected) {
-            let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
+            f.Debug.info("No object selected");
             for (let controllableObject of controllableObjects.getIterator()) {
                 if (controllableObject.name == "Controllables") {
                     continue; //ignoring parent object since it cannot be moved and causes problems otherwise
@@ -96,7 +103,7 @@ var TheYourneyOfY;
                 let componentMesh = controllableObject.getComponent(f.ComponentMesh);
                 let position = componentMesh ? componentMesh.mtxWorld.translation : controllableObject.mtxWorld.translation;
                 if (ray.getDistance(position).magnitude < controllableObject.radius) {
-                    //f.Debug.info("hovering over controllable object named: " + controllableObject.name);
+                    f.Debug.info("hovering over controllable object named: " + controllableObject.name);
                     hoveringOverControllableObject = true;
                     hoveredObject = controllableObject;
                     break; //ignoring other controllable objects. There can only be one.
@@ -106,18 +113,41 @@ var TheYourneyOfY;
                 }
             }
         }
+        else {
+            /*
+            for (let borderObject of borderObjects.getIterator()) {
+                if (borderObject.name == "MovementBorder") {
+                    continue; //ignoring parent object since it is not relevant and causes problems otherwise
+                }
+                let componentMesh: f.ComponentMesh = borderObject.getComponent(f.ComponentMesh);
+                let position: f.Vector3 = componentMesh ? componentMesh.mtxWorld.translation : borderObject.mtxWorld.translation;
+                if (ray.getDistance(position).magnitude < borderObject.radius) {
+                    f.Debug.info("Hovering over " + borderObject.name + "! releasing object...");
+                    releaseObject();
+                    break; //ignoring other controllable objects. There can only be one.
+                }
+            }
+
+             */
+        }
     }
     function mouseDownObserver(_event) {
         if (hoveringOverControllableObject) {
             objectSelected = true;
             controlledObject = hoveredObject;
+            controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 0;
+            //trying to stop rotation
+            controlledObject.getComponent(f.ComponentRigidbody).setRotation(new f.Vector3(0, 0, 0));
+            controlledObject.getComponent(f.ComponentRigidbody).setVelocity(new f.Vector3(0, 0, 0));
+            controlledObject.getComponent(f.ComponentRigidbody).applyTorque(new f.Vector3(0, 0, 0));
+            controlledObject.mtxWorld.rotate(new f.Vector3(0, 0, 0));
             //f.Debug.info("Clicked controllable object named: " + controlledObject.name);
         }
     }
     function mouseUpObserver(_event) {
-        objectSelected = false;
-        hoveredObject = null;
-        controlledObject = null;
+        if (objectSelected) {
+            releaseObject();
+        }
     }
     function mouseMoveObserver(_event) {
         if (objectSelected) {
@@ -125,7 +155,17 @@ var TheYourneyOfY;
             let mousePositionOnWorld = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
             let moveVector = f.Vector3.DIFFERENCE(mousePositionOnWorld, controlledObject.mtxLocal.translation);
             controlledObject.getComponent(f.ComponentRigidbody).translateBody(moveVector);
+            controlledObject.getComponent(f.ComponentRigidbody).getPosition().z = 0;
+            controlledObject.getComponent(f.ComponentRigidbody).getAngularVelocity().z = 0;
+            controlledObject.getComponent(f.ComponentRigidbody).getRotation().z = 0;
         }
+    }
+    function releaseObject() {
+        controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 1;
+        //controlledObject.getComponent(f.ComponentRigidbody).translateBody(currentPosition);
+        objectSelected = false;
+        hoveredObject = null;
+        controlledObject = null;
     }
     async function setup() {
         console.log("setting up...");
@@ -168,13 +208,9 @@ var TheYourneyOfY;
         name = "Agent Smith";
         mesh;
         ctrForward;
-        speed; //TODO crate logic
-        rotationSpeed;
         deltaTime;
-        constructor(name, speed, rotationSpeed) {
-            super("Agent");
-            this.name = name;
-            this.rotationSpeed = rotationSpeed;
+        constructor() {
+            super("Player");
             this.ctrForward = this.ctrForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
             this.ctrForward.setDelay(200);
             this.initiatePositionAndScale();
@@ -182,34 +218,42 @@ var TheYourneyOfY;
         }
         initiatePositionAndScale() {
             this.addComponent(new f.ComponentTransform);
-            this.addComponent(new f.ComponentMesh(new f.MeshCube("Player"))); //TODO move to static variable for all agents
-            this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1)))));
+            this.addComponent(new f.ComponentMesh(new f.MeshCube("Player")));
+            this.addComponent(new f.ComponentMaterial(new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1)))));
             this.addComponent(new f.ComponentRigidbody());
-            this.getComponent(f.ComponentRigidbody).effectGravity = 0;
+            this.getComponent(f.ComponentRigidbody).initialization = 2; //TO_PIVOT
+            this.getComponent(f.ComponentRigidbody).effectGravity = 1;
             //set position
             this.mtxLocal.translateZ(0);
             this.mtxLocal.translateY(4);
-            this.mtxLocal.translateX(5);
+            this.mtxLocal.translateX(0);
             //set scale
             this.mtxLocal.scale(f.Vector3.ONE(0.5));
         }
         update = (_event) => {
             this.deltaTime = f.Loop.timeFrameReal / 1000;
-            this.handleAgentMovement();
-            this.handleAgentRotation();
+            this.handlePlayerMovement();
         };
-        handleAgentMovement() {
-            let inputValue = (f.Keyboard.mapToValue(-5, 0, [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN])
-                + f.Keyboard.mapToValue(5, 0, [f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP]));
+        handlePlayerMovement() {
+            let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
+            this.ctrForward.setInput(forward);
+            this.getComponent(f.ComponentRigidbody).applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
+            console.log(this.ctrForward.getOutput());
+            //this.ctrForward.setInput(configurations.initialspeed);
+            //this.getComponent(f.ComponentRigidbody).applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrlForward.getOutput()));
+            /*
+            f.Debug.info("player-movement");
+            let inputValue: number = (
+                f.Keyboard.mapToValue(-5, 0, [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT])
+                + f.Keyboard.mapToValue(5, 0, [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT])
+            );
+
+
             this.ctrForward.setInput(inputValue * this.deltaTime);
             this.mtxLocal.translateY(this.ctrForward.getOutput());
             //console.log(this.ctrForward.getOutput())
-        }
-        handleAgentRotation() {
-            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]))
-                this.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
-            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT]))
-                this.mtxLocal.rotateZ(-this.rotationSpeed * this.deltaTime);
+
+             */
         }
     }
     TheYourneyOfY.Player = Player;

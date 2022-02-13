@@ -6,14 +6,11 @@ namespace TheYourneyOfY {
         public name: string = "Agent Smith";
         mesh: f.Node;
         ctrForward: f.Control;
-        speed: number; //TODO crate logic
-        rotationSpeed: number;
         private deltaTime: number;
 
-        constructor(name: string, speed: number, rotationSpeed: number) {
-            super("Agent");
-            this.name = name;
-            this.rotationSpeed = rotationSpeed;
+
+        constructor() {
+            super("Player");
             this.ctrForward = this.ctrForward = new f.Control("Forward", 1, f.CONTROL_TYPE.PROPORTIONAL);
             this.ctrForward.setDelay(200);
 
@@ -23,17 +20,18 @@ namespace TheYourneyOfY {
 
         private initiatePositionAndScale(): void {
             this.addComponent(new f.ComponentTransform);
-            this.addComponent(new f.ComponentMesh(new f.MeshCube("Player"))); //TODO move to static variable for all agents
+            this.addComponent(new f.ComponentMesh(new f.MeshCube("Player")));
             this.addComponent(new f.ComponentMaterial(
-                new f.Material("mtrAgent", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1))))
+                new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1))))
             );
             this.addComponent(new f.ComponentRigidbody());
-            this.getComponent(f.ComponentRigidbody).effectGravity = 0;
+            this.getComponent(f.ComponentRigidbody).initialization = 2; //TO_PIVOT
+            this.getComponent(f.ComponentRigidbody).effectGravity = 1;
 
             //set position
             this.mtxLocal.translateZ(0);
             this.mtxLocal.translateY(4);
-            this.mtxLocal.translateX(5);
+            this.mtxLocal.translateX(0);
 
             //set scale
             this.mtxLocal.scale(f.Vector3.ONE(0.5));
@@ -41,28 +39,37 @@ namespace TheYourneyOfY {
 
         private update = (_event: Event) => {
             this.deltaTime = f.Loop.timeFrameReal / 1000;
-            this.handleAgentMovement();
-            this.handleAgentRotation();
+            this.handlePlayerMovement();
         }
 
-        private handleAgentMovement() {
+        private handlePlayerMovement() {
+            let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
+            this.ctrForward.setInput(forward);
+
+
+            this.getComponent(f.ComponentRigidbody).applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
+            console.log(this.ctrForward.getOutput());
+
+
+
+            //this.ctrForward.setInput(configurations.initialspeed);
+            //this.getComponent(f.ComponentRigidbody).applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrlForward.getOutput()));
+            /*
+            f.Debug.info("player-movement");
             let inputValue: number = (
-                f.Keyboard.mapToValue(-5, 0, [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN])
-                + f.Keyboard.mapToValue(5, 0, [f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP])
+                f.Keyboard.mapToValue(-5, 0, [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT])
+                + f.Keyboard.mapToValue(5, 0, [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT])
             );
+
+
             this.ctrForward.setInput(inputValue * this.deltaTime);
             this.mtxLocal.translateY(this.ctrForward.getOutput());
             //console.log(this.ctrForward.getOutput())
+
+             */
         }
 
 
-
-        private handleAgentRotation(): void {
-            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]))
-                this.mtxLocal.rotateZ(this.rotationSpeed * this.deltaTime);
-            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT]))
-                this.mtxLocal.rotateZ(-this.rotationSpeed * this.deltaTime);
-        }
 
 
     }
