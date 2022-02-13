@@ -1,5 +1,6 @@
 namespace TheYourneyOfY {
     import f = FudgeCore;
+    import Vector3 = FudgeCore.Vector3;
     f.Debug.info("Main Program Template running!");
 
     window.addEventListener("load", setup);
@@ -47,10 +48,12 @@ namespace TheYourneyOfY {
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         spawnPlayer();
 
-        viewport.getCanvas().addEventListener("mousemove", mouseHoverObserver);
-        viewport.getCanvas().addEventListener("mousedown", mouseDownObserver);
-        viewport.getCanvas().addEventListener("mousemove", mouseMoveObserver);
-        viewport.getCanvas().addEventListener("mouseup", mouseUpObserver);
+        viewport.getCanvas().addEventListener("mousemove", mouseHoverHandler);
+        viewport.getCanvas().addEventListener("mousedown", mouseDownHandler);
+        viewport.getCanvas().addEventListener("mousemove", mouseMoveHandler);
+        viewport.getCanvas().addEventListener("mouseup", mouseUpHandler);
+        viewport.getCanvas().addEventListener("wheel", scrollHandler);
+
 
 
         f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
@@ -70,7 +73,7 @@ namespace TheYourneyOfY {
         f.AudioManager.default.update();
     }
 
-    function mouseHoverObserver(_event: MouseEvent): void {
+    function mouseHoverHandler(_event: MouseEvent): void {
         let ray: f.Ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
         if (!objectSelected) {
             f.Debug.info("No object selected");
@@ -109,7 +112,7 @@ namespace TheYourneyOfY {
 
     }
 
-    function mouseDownObserver(_event: MouseEvent): void {
+    function mouseDownHandler(_event: MouseEvent): void {
         if (hoveringOverControllableObject) {
             objectSelected = true;
             controlledObject = hoveredObject;
@@ -124,13 +127,13 @@ namespace TheYourneyOfY {
         }
     }
 
-    function mouseUpObserver(_event: MouseEvent): void {
+    function mouseUpHandler(_event: MouseEvent): void {
         if (objectSelected) {
             releaseObject();
         }
     }
 
-    function mouseMoveObserver(_event: MouseEvent): void {
+    function mouseMoveHandler(_event: MouseEvent): void {
         if (objectSelected) {
             let ray: f.Ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
             let mousePositionOnWorld: f.Vector3 = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
@@ -140,6 +143,12 @@ namespace TheYourneyOfY {
             controlledObject.getComponent(f.ComponentRigidbody).getAngularVelocity().z = 0;
             controlledObject.getComponent(f.ComponentRigidbody).getRotation().z = 0;
 
+        }
+    }
+
+    function scrollHandler(_event: WheelEvent): void{
+        if(objectSelected){
+            controlledObject.getComponent(f.ComponentRigidbody).rotateBody(new Vector3(0,0,_event.deltaY));
         }
     }
 

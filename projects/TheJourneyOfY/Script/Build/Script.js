@@ -39,6 +39,7 @@ var Script;
 var TheYourneyOfY;
 (function (TheYourneyOfY) {
     var f = FudgeCore;
+    var Vector3 = FudgeCore.Vector3;
     f.Debug.info("Main Program Template running!");
     window.addEventListener("load", setup);
     let viewport;
@@ -74,10 +75,11 @@ var TheYourneyOfY;
         f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         spawnPlayer();
-        viewport.getCanvas().addEventListener("mousemove", mouseHoverObserver);
-        viewport.getCanvas().addEventListener("mousedown", mouseDownObserver);
-        viewport.getCanvas().addEventListener("mousemove", mouseMoveObserver);
-        viewport.getCanvas().addEventListener("mouseup", mouseUpObserver);
+        viewport.getCanvas().addEventListener("mousemove", mouseHoverHandler);
+        viewport.getCanvas().addEventListener("mousedown", mouseDownHandler);
+        viewport.getCanvas().addEventListener("mousemove", mouseMoveHandler);
+        viewport.getCanvas().addEventListener("mouseup", mouseUpHandler);
+        viewport.getCanvas().addEventListener("wheel", scrollHandler);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -92,7 +94,7 @@ var TheYourneyOfY;
         }
         f.AudioManager.default.update();
     }
-    function mouseHoverObserver(_event) {
+    function mouseHoverHandler(_event) {
         let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
         if (!objectSelected) {
             f.Debug.info("No object selected");
@@ -131,7 +133,7 @@ var TheYourneyOfY;
              */
         }
     }
-    function mouseDownObserver(_event) {
+    function mouseDownHandler(_event) {
         if (hoveringOverControllableObject) {
             objectSelected = true;
             controlledObject = hoveredObject;
@@ -144,12 +146,12 @@ var TheYourneyOfY;
             //f.Debug.info("Clicked controllable object named: " + controlledObject.name);
         }
     }
-    function mouseUpObserver(_event) {
+    function mouseUpHandler(_event) {
         if (objectSelected) {
             releaseObject();
         }
     }
-    function mouseMoveObserver(_event) {
+    function mouseMoveHandler(_event) {
         if (objectSelected) {
             let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
             let mousePositionOnWorld = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
@@ -158,6 +160,11 @@ var TheYourneyOfY;
             controlledObject.getComponent(f.ComponentRigidbody).getPosition().z = 0;
             controlledObject.getComponent(f.ComponentRigidbody).getAngularVelocity().z = 0;
             controlledObject.getComponent(f.ComponentRigidbody).getRotation().z = 0;
+        }
+    }
+    function scrollHandler(_event) {
+        if (objectSelected) {
+            controlledObject.getComponent(f.ComponentRigidbody).rotateBody(new Vector3(0, 0, _event.deltaY));
         }
     }
     function releaseObject() {
