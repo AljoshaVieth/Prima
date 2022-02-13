@@ -80,6 +80,14 @@
       }
     }
   },
+  "Audio|2022-02-13T21:42:49.706Z|86540": {
+    "ƒ.Audio": {
+      "url": "Sounds\\swosh.wav",
+      "idResource": "Audio|2022-02-13T21:42:49.706Z|86540",
+      "name": "Sounds\\swosh.wav",
+      "type": "Audio"
+    }
+  },
   "Graph|2022-01-08T12:51:22.101Z|15244": {
     "ƒ.Graph": {
       "name": "Graph",
@@ -468,9 +476,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[0, 0, 0]",
+                                                    "translation": "[0, 0.7000000476837158, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[1, 1, 1]"
+                                                    "scaling": "[1, 0.30000001192092896, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -516,6 +524,45 @@
                                                     "active": true
                                                   },
                                                   "idMaterial": "Material|2022-01-08T15:28:39.028Z|46109"
+                                                }
+                                              }
+                                            ],
+                                            "ComponentTransform": [
+                                              {
+                                                "ƒ.ComponentTransform": {
+                                                  "local": {
+                                                    "translation": "[0, 0.7000000476837158, 0]",
+                                                    "rotation": "[0, 0, 0]",
+                                                    "scaling": "[1, 0.30000001192092896, 1]"
+                                                  },
+                                                  "Component": {
+                                                    "active": true
+                                                  }
+                                                }
+                                              }
+                                            ],
+                                            "ComponentRigidbody": [
+                                              {
+                                                "ƒ.ComponentRigidbody": {
+                                                  "initialization": "TO_MESH",
+                                                  "friction": 0.2,
+                                                  "restitution": 0.2,
+                                                  "mass": 0,
+                                                  "dampTranslation": 0.1,
+                                                  "dampRotation": 0.1,
+                                                  "effectGravity": 0,
+                                                  "typeBody": "DYNAMIC",
+                                                  "typeCollider": "CUBE",
+                                                  "isTrigger": false,
+                                                  "id": 1,
+                                                  "pivot": {
+                                                    "translation": "[10, 0, 0]",
+                                                    "rotation": "[0, 0, 0]",
+                                                    "scaling": "[6, 2, 1]"
+                                                  },
+                                                  "Component": {
+                                                    "active": true
+                                                  }
                                                 }
                                               }
                                             ]
@@ -743,14 +790,6 @@
       ],
       "idResource": "Graph|2022-01-08T12:51:22.101Z|15244",
       "type": "Graph"
-    }
-  },
-  "Audio|2022-02-13T21:42:49.706Z|86540": {
-    "ƒ.Audio": {
-      "url": "Sounds\\swosh.wav",
-      "idResource": "Audio|2022-02-13T21:42:49.706Z|86540",
-      "name": "Sounds\\swosh.wav",
-      "type": "Audio"
     }
   }
 }
