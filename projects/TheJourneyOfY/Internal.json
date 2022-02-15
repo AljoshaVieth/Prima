@@ -158,7 +158,7 @@
                                                   "pivot": {
                                                     "translation": "[0, 0, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[2, 1, 1]"
+                                                    "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -190,7 +190,7 @@
                                                   "local": {
                                                     "translation": "[0, 2, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[0.5, 0.5, 0.5]"
+                                                    "scaling": "[1.9999998807907104, 0.9999998807907104, 0.9999998807907104]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -204,7 +204,7 @@
                                                   "initialization": "TO_PIVOT",
                                                   "friction": 0.2,
                                                   "restitution": 0.2,
-                                                  "mass": 1,
+                                                  "mass": 10,
                                                   "dampTranslation": 0.1,
                                                   "dampRotation": 0.1,
                                                   "effectGravity": 1,
@@ -268,9 +268,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[1, 2, 0]",
+                                                    "translation": "[3, 2, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[0.5, 0.5, 0.5]"
+                                                    "scaling": "[0.9999998807907104, 0.9999998807907104, 0.9999998807907104]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -284,7 +284,7 @@
                                                   "initialization": "TO_PIVOT",
                                                   "friction": 0.2,
                                                   "restitution": 0.2,
-                                                  "mass": 1,
+                                                  "mass": 5,
                                                   "dampTranslation": 0.1,
                                                   "dampRotation": 0.1,
                                                   "effectGravity": 1,
@@ -348,9 +348,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[2, 2, 0]",
+                                                    "translation": "[9, 2, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[0.5, 0.5, 0.5]"
+                                                    "scaling": "[0.9999998807907104, 0.9999998807907104, 0.9999998807907104]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -364,7 +364,7 @@
                                                   "initialization": "TO_PIVOT",
                                                   "friction": 0.2,
                                                   "restitution": 0.2,
-                                                  "mass": 1,
+                                                  "mass": 5,
                                                   "dampTranslation": 0.1,
                                                   "dampRotation": 0.1,
                                                   "effectGravity": 1,
@@ -421,7 +421,7 @@
                                                   "pivot": {
                                                     "translation": "[0, 0, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[8, 2, 1]"
+                                                    "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -464,7 +464,7 @@
                                                   "pivot": {
                                                     "translation": "[0, 0, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[8, 2, 1]"
+                                                    "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -476,9 +476,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[0, 0.7000000476837158, 0]",
+                                                    "translation": "[0, -2, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[1, 0.30000001192092896, 1]"
+                                                    "scaling": "[10, 3, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -499,9 +499,9 @@
                                                 "ƒ.ComponentMesh": {
                                                   "idMesh": "MeshCube|2022-01-08T15:27:19.926Z|11492",
                                                   "pivot": {
-                                                    "translation": "[10, 0, 0]",
+                                                    "translation": "[0, 0, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[6, 2, 1]"
+                                                    "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -531,9 +531,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[0, 0.7000000476837158, 0]",
+                                                    "translation": "[13, -2, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[1, 0.30000001192092896, 1]"
+                                                    "scaling": "[10, 3, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -556,9 +556,9 @@
                                                   "isTrigger": false,
                                                   "id": 1,
                                                   "pivot": {
-                                                    "translation": "[10, 0, 0]",
+                                                    "translation": "[0, 0, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[6, 2, 1]"
+                                                    "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -642,7 +642,7 @@
                                                     "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
-                                                    "active": true
+                                                    "active": false
                                                   }
                                                 }
                                               }
@@ -722,7 +722,7 @@
                                                     "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
-                                                    "active": true
+                                                    "active": false
                                                   }
                                                 }
                                               }

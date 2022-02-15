@@ -89,7 +89,7 @@ var TheYourneyOfY;
     document.addEventListener("interactiveViewportStarted", start);
     let canvas;
     let graph;
-    let desiredZoomLevel = -60;
+    let desiredZoomLevel = -70;
     let currentZoomLevel = -80;
     let graphId = "Graph|2022-01-08T12:51:22.101Z|15244";
     let objectSelected = false;
@@ -329,7 +329,7 @@ var TheYourneyOfY;
             this.mtxLocal.translateY(4);
             this.mtxLocal.translateX(0);
             //set scale
-            this.mtxLocal.scale(f.Vector3.ONE(0.5));
+            this.mtxLocal.scale(f.Vector3.ONE(1));
         }
         update = (_event) => {
             this.handlePlayerMovement();
@@ -358,9 +358,10 @@ var TheYourneyOfY;
             // Jump (using simple keyboard event instead of control since it´s easier in this case)
             if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround) {
                 f.Debug.info("Lets goooooo");
-                let velocity = this.rigidbody.getVelocity();
-                velocity.y = 2;
-                this.rigidbody.setVelocity(velocity);
+                this.rigidbody.applyForce(new f.Vector3(0, 20, 0));
+                //let velocity: f.Vector3 = this.rigidbody.getVelocity();
+                //velocity.y = 2;
+                //this.rigidbody.setVelocity(velocity);
             }
         }
     }

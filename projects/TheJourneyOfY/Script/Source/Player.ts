@@ -40,7 +40,7 @@ namespace TheYourneyOfY {
             this.mtxLocal.translateX(0);
 
             //set scale
-            this.mtxLocal.scale(f.Vector3.ONE(0.5));
+            this.mtxLocal.scale(f.Vector3.ONE(1));
         }
 
         private update = (_event: Event) => {
@@ -73,9 +73,10 @@ namespace TheYourneyOfY {
             // Jump (using simple keyboard event instead of control since it´s easier in this case)
             if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround){
                 f.Debug.info("Lets goooooo");
-                let velocity: f.Vector3 = this.rigidbody.getVelocity();
-                velocity.y = 2;
-                this.rigidbody.setVelocity(velocity);
+                this.rigidbody.applyForce(new f.Vector3(0,20,0));
+                //let velocity: f.Vector3 = this.rigidbody.getVelocity();
+                //velocity.y = 2;
+                //this.rigidbody.setVelocity(velocity);
             }
         }
     }

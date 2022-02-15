@@ -12,7 +12,7 @@ namespace TheYourneyOfY {
     document.addEventListener("interactiveViewportStarted", <EventListener>start);
     let canvas: HTMLCanvasElement;
     let graph: f.Node;
-    let desiredZoomLevel: number = -60;
+    let desiredZoomLevel: number = -70;
     let currentZoomLevel: number = -80;
     let graphId: string = "Graph|2022-01-08T12:51:22.101Z|15244";
     let objectSelected: boolean = false;
