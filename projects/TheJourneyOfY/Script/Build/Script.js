@@ -1,6 +1,48 @@
 "use strict";
 var TheYourneyOfY;
 (function (TheYourneyOfY) {
+    var f = FudgeCore;
+    var ComponentTransform = FudgeCore.ComponentTransform;
+    f.Project.registerScriptNamespace(TheYourneyOfY); // Register the namespace to FUDGE for serialization
+    class CameraMovementScript extends f.ComponentScript {
+        // Register the script as component for use in the editor via drag&drop
+        static iSubclass = f.Component.registerSubclass(CameraMovementScript);
+        // Properties may be mutated by users in the editor via the automatically created user interface
+        message = "CameraMovementScript added to ";
+        constructor() {
+            super();
+            // Don't start when running in editor
+            if (f.Project.mode == f.MODE.EDITOR)
+                return;
+            // Listen to this component being added to or removed from a node
+            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+        }
+        // Activate the functions of this component as response to events
+        hndEvent = (_event) => {
+            switch (_event.type) {
+                case "componentAdd" /* COMPONENT_ADD */:
+                    f.Debug.log(this.message, this.node);
+                    this.start();
+                    break;
+                case "componentRemove" /* COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                    break;
+            }
+        };
+        start() {
+            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+        }
+        update = (_event) => {
+            let moveVector = f.Vector3.DIFFERENCE(TheYourneyOfY.player.mtxLocal.translation, this.node.getComponent(ComponentTransform).mtxLocal.translation);
+            this.node.getComponent(ComponentTransform).mtxLocal.translate(moveVector);
+        };
+    }
+    TheYourneyOfY.CameraMovementScript = CameraMovementScript;
+})(TheYourneyOfY || (TheYourneyOfY = {}));
+var TheYourneyOfY;
+(function (TheYourneyOfY) {
     var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(TheYourneyOfY); // Register the namespace to FUDGE for serialization
     class CustomComponentScript extends ƒ.ComponentScript {
@@ -38,6 +80,7 @@ var TheYourneyOfY;
 })(TheYourneyOfY || (TheYourneyOfY = {}));
 var TheYourneyOfY;
 (function (TheYourneyOfY) {
+    // import * as configJson from "../../config.json"; // This import style requires "esModuleInterop" (tsconfig: "resolveJsonModule": true, "esModuleInterop": true) TypeScript 2.9+
     var f = FudgeCore;
     var Vector3 = FudgeCore.Vector3;
     f.Debug.info("Main Program Template running!");
@@ -46,7 +89,7 @@ var TheYourneyOfY;
     document.addEventListener("interactiveViewportStarted", start);
     let canvas;
     let graph;
-    let desiredZoomLevel = -30;
+    let desiredZoomLevel = -60;
     let currentZoomLevel = -80;
     let graphId = "Graph|2022-01-08T12:51:22.101Z|15244";
     let objectSelected = false;
@@ -58,6 +101,7 @@ var TheYourneyOfY;
     let swoshSound;
     let cmpCamera;
     let cameraNode;
+    let apiURL;
     let activatePhysics = true;
     let body;
     async function start(_event) {
@@ -129,10 +173,15 @@ var TheYourneyOfY;
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        if (activatePhysics) {
+        if (activatePhysics && currentZoomLevel == desiredZoomLevel) {
             f.Physics.world.simulate(); // if physics is included and used
         }
         viewport.draw();
+        //zoom in
+        if (currentZoomLevel < desiredZoomLevel) {
+            currentZoomLevel++;
+            cmpCamera.mtxPivot.translateZ(1);
+        }
         f.AudioManager.default.update();
     }
     function mouseHoverHandler(_event) {
@@ -220,6 +269,18 @@ var TheYourneyOfY;
     async function setup() {
         canvas = document.querySelector("canvas");
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
+        await loadConfig();
+        f.Debug.info("apiURL: " + apiURL);
+    }
+    async function loadConfig() {
+        try {
+            const response = await fetch("../../config.json");
+            const configJson = await response.json();
+            apiURL = configJson.apiURL;
+        }
+        catch (error) {
+            return error;
+        }
     }
     function initializeCollisionGroups() {
         // ground
@@ -304,47 +365,5 @@ var TheYourneyOfY;
         }
     }
     TheYourneyOfY.Player = Player;
-})(TheYourneyOfY || (TheYourneyOfY = {}));
-var TheYourneyOfY;
-(function (TheYourneyOfY) {
-    var f = FudgeCore;
-    var ComponentTransform = FudgeCore.ComponentTransform;
-    f.Project.registerScriptNamespace(TheYourneyOfY); // Register the namespace to FUDGE for serialization
-    class CameraMovementScript extends f.ComponentScript {
-        // Register the script as component for use in the editor via drag&drop
-        static iSubclass = f.Component.registerSubclass(CameraMovementScript);
-        // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "CameraMovementScript added to ";
-        constructor() {
-            super();
-            // Don't start when running in editor
-            if (f.Project.mode == f.MODE.EDITOR)
-                return;
-            // Listen to this component being added to or removed from a node
-            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-        }
-        // Activate the functions of this component as response to events
-        hndEvent = (_event) => {
-            switch (_event.type) {
-                case "componentAdd" /* COMPONENT_ADD */:
-                    f.Debug.log(this.message, this.node);
-                    this.start();
-                    break;
-                case "componentRemove" /* COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-                    break;
-            }
-        };
-        start() {
-            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
-        }
-        update = (_event) => {
-            let moveVector = f.Vector3.DIFFERENCE(TheYourneyOfY.player.mtxLocal.translation, this.node.getComponent(ComponentTransform).mtxLocal.translation);
-            this.node.getComponent(ComponentTransform).mtxLocal.translate(moveVector);
-        };
-    }
-    TheYourneyOfY.CameraMovementScript = CameraMovementScript;
 })(TheYourneyOfY || (TheYourneyOfY = {}));
 //# sourceMappingURL=Script.js.map

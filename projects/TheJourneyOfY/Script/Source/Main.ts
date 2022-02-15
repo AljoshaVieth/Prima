@@ -1,7 +1,10 @@
 namespace TheYourneyOfY {
+    // import * as configJson from "../../config.json"; // This import style requires "esModuleInterop" (tsconfig: "resolveJsonModule": true, "esModuleInterop": true) TypeScript 2.9+
     import f = FudgeCore;
     import Vector3 = FudgeCore.Vector3;
     import Node = FudgeCore.Node;
+
+
     f.Debug.info("Main Program Template running!");
 
     window.addEventListener("load", setup);
@@ -9,7 +12,7 @@ namespace TheYourneyOfY {
     document.addEventListener("interactiveViewportStarted", <EventListener>start);
     let canvas: HTMLCanvasElement;
     let graph: f.Node;
-    let desiredZoomLevel: number = -30;
+    let desiredZoomLevel: number = -60;
     let currentZoomLevel: number = -80;
     let graphId: string = "Graph|2022-01-08T12:51:22.101Z|15244";
     let objectSelected: boolean = false;
@@ -22,6 +25,7 @@ namespace TheYourneyOfY {
     let swoshSound: f.Node;
     let cmpCamera: f.ComponentCamera;
     let cameraNode: f.Node;
+    let apiURL: string;
 
 
     let activatePhysics: boolean = true;
@@ -121,11 +125,16 @@ namespace TheYourneyOfY {
     }
 
     function update(_event: Event): void {
-        if (activatePhysics) {
+        if (activatePhysics && currentZoomLevel == desiredZoomLevel) {
             f.Physics.world.simulate();  // if physics is included and used
         }
         viewport.draw();
 
+        //zoom in
+        if (currentZoomLevel < desiredZoomLevel) {
+            currentZoomLevel++;
+            cmpCamera.mtxPivot.translateZ(1);
+        }
 
         f.AudioManager.default.update();
     }
@@ -223,6 +232,19 @@ namespace TheYourneyOfY {
     async function setup(): Promise<void> {
         canvas = document.querySelector("canvas");
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", {bubbles: true, detail: viewport}));
+
+        await loadConfig();
+        f.Debug.info("apiURL: " + apiURL);
+    }
+
+    async function loadConfig() {
+        try {
+            const response = await fetch("../../config.json");
+            const configJson = await response.json();
+            apiURL = configJson.apiURL;
+        } catch (error) {
+            return error;
+        }
     }
 
     function initializeCollisionGroups() {
