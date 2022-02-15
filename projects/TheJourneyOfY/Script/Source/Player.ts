@@ -2,18 +2,16 @@ namespace TheYourneyOfY {
     import f = FudgeCore;
 
     export class Player extends f.Node {
-        public health: number = 1;
         public name: string = "Agent Smith";
-        mesh: f.Node;
-        ctrForward: f.Control;
-        private deltaTime: number;
+        private ctrForward: f.Control;
+        private rigidbody: f.ComponentRigidbody;
+        private isOnGround: boolean;
 
 
         constructor() {
             super("Player");
-            this.ctrForward = this.ctrForward = new f.Control("Forward", 1, f.CONTROL_TYPE.PROPORTIONAL);
+            this.ctrForward = this.ctrForward = new f.Control("Forward", 10, f.CONTROL_TYPE.PROPORTIONAL);
             this.ctrForward.setDelay(200);
-
             this.initiatePositionAndScale();
             f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
         }
@@ -24,9 +22,17 @@ namespace TheYourneyOfY {
             this.addComponent(new f.ComponentMaterial(
                 new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1))))
             );
-            this.addComponent(new f.ComponentRigidbody());
-            this.getComponent(f.ComponentRigidbody).initialization = 2; //TO_PIVOT
-            this.getComponent(f.ComponentRigidbody).effectGravity = 1;
+            this.rigidbody = new f.ComponentRigidbody();
+            this.addComponent(this.rigidbody);
+
+            this.rigidbody.initialization = f.BODY_INIT.TO_PIVOT; //TO_PIVOT
+            this.rigidbody.effectGravity = 1;
+            this.rigidbody.typeBody = f.BODY_TYPE.DYNAMIC;
+            this.rigidbody.mass = 1;
+            this.rigidbody.effectRotation = new f.Vector3(0, 0, 0);
+            this.rigidbody.typeCollider = f.COLLIDER_TYPE.CUBE;
+            this.rigidbody.collisionGroup = f.COLLISION_GROUP.GROUP_1;
+
 
             //set position
             this.mtxLocal.translateZ(0);
@@ -38,40 +44,40 @@ namespace TheYourneyOfY {
         }
 
         private update = (_event: Event) => {
-            this.deltaTime = f.Loop.timeFrameReal / 1000;
             this.handlePlayerMovement();
         }
 
         private handlePlayerMovement() {
+            // Forward
             let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
             this.ctrForward.setInput(forward);
+            this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
+            //console.log(this.ctrForward.getOutput());
 
+            this.isOnGround = false;
+            let playerCollisions: f.ComponentRigidbody[] = this.rigidbody.collisions;
+            playerCollisions.forEach(collider => {
+                f.Debug.info("Collider: " + collider.node.name);
+                switch (collider.collisionGroup) {
+                    case f.COLLISION_GROUP.GROUP_2: //Ground elements
+                        this.isOnGround = true;
+                        break;
+                    case f.COLLISION_GROUP.GROUP_3: //Obstacles
+                        this.isOnGround = true;
+                        break;
+                    default:
+                        break;
+                }
+            });
 
-            this.getComponent(f.ComponentRigidbody).applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
-            console.log(this.ctrForward.getOutput());
-
-
-
-            //this.ctrForward.setInput(configurations.initialspeed);
-            //this.getComponent(f.ComponentRigidbody).applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrlForward.getOutput()));
-            /*
-            f.Debug.info("player-movement");
-            let inputValue: number = (
-                f.Keyboard.mapToValue(-5, 0, [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT])
-                + f.Keyboard.mapToValue(5, 0, [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT])
-            );
-
-
-            this.ctrForward.setInput(inputValue * this.deltaTime);
-            this.mtxLocal.translateY(this.ctrForward.getOutput());
-            //console.log(this.ctrForward.getOutput())
-
-             */
+            // Jump (using simple keyboard event instead of control since it´s easier in this case)
+            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround){
+                f.Debug.info("Lets goooooo");
+                let velocity: f.Vector3 = this.rigidbody.getVelocity();
+                velocity.y = 2;
+                this.rigidbody.setVelocity(velocity);
+            }
         }
-
-
-
-
     }
 
 }

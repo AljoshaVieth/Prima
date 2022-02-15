@@ -1,8 +1,8 @@
 "use strict";
-var Script;
-(function (Script) {
+var TheYourneyOfY;
+(function (TheYourneyOfY) {
     var ƒ = FudgeCore;
-    ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
+    ƒ.Project.registerScriptNamespace(TheYourneyOfY); // Register the namespace to FUDGE for serialization
     class CustomComponentScript extends ƒ.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
         static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
@@ -34,8 +34,8 @@ var Script;
             }
         };
     }
-    Script.CustomComponentScript = CustomComponentScript;
-})(Script || (Script = {}));
+    TheYourneyOfY.CustomComponentScript = CustomComponentScript;
+})(TheYourneyOfY || (TheYourneyOfY = {}));
 var TheYourneyOfY;
 (function (TheYourneyOfY) {
     var f = FudgeCore;
@@ -44,26 +44,62 @@ var TheYourneyOfY;
     window.addEventListener("load", setup);
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
+    let canvas;
     let graph;
     let desiredZoomLevel = -30;
     let currentZoomLevel = -80;
-    let cmpCamera;
     let graphId = "Graph|2022-01-08T12:51:22.101Z|15244";
     let objectSelected = false;
     let hoveringOverControllableObject = false;
-    let player;
     let controllableObjects;
-    let borderObjects;
+    let groundObjects;
     let hoveredObject = null;
     let controlledObject = null;
     let swoshSound;
+    let cmpCamera;
+    let cameraNode;
     let activatePhysics = true;
     let body;
-    function start(_event) {
+    async function start(_event) {
+        console.log("setting up...");
+        await FudgeCore.Project.loadResourcesFromHTML();
+        graph = f.Project.resources[graphId];
+        // setup the viewport
+        cmpCamera = new FudgeCore.ComponentCamera();
+        cmpCamera.mtxPivot.rotateY(180);
+        cmpCamera.mtxPivot.translateZ(-30);
+        //graph.addComponent(cmpCamera);
+        viewport = new f.Viewport();
+        TheYourneyOfY.player = new TheYourneyOfY.Player();
+        f.Debug.info("Spawned Player");
+        viewport.initialize("Viewport", graph, cmpCamera, canvas);
+        viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(TheYourneyOfY.player);
+        FudgeCore.Debug.log("Viewport:", viewport);
+        //cameraNode.addComponent(new CameraScript);
+        // hide the cursor when interacting, also suppressing right-click menu
+        //canvas.addEventListener("mousedown", canvas.requestPointerLock);
+        //canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
+        // make the camera interactive (complex method in FudgeAid)
+        //FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
+        // setup audio
+        let cmpListener = new f.ComponentAudioListener();
+        //cmpCamera.node.addComponent(cmpListener);
+        //cmpCamera.node.addComponent(new CameraScript());
+        cameraNode = new f.Node("cameraNode");
+        cameraNode.addComponent(cmpCamera);
+        cameraNode.addComponent(new f.ComponentTransform);
+        cameraNode.addComponent(new TheYourneyOfY.CameraMovementScript());
+        //cameraNode.addComponent(cmpListener);
+        graph.addChild(cameraNode);
+        FudgeCore.AudioManager.default.listenWith(cmpListener);
+        FudgeCore.AudioManager.default.listenTo(graph);
+        FudgeCore.Debug.log("Audio:", FudgeCore.AudioManager.default);
+        // draw viewport once for immediate feedback
+        //viewport.draw();
         body = document.getElementsByTagName('body')[0];
         console.log("Starting...");
-        viewport = _event.detail;
-        graph = viewport.getBranch();
+        //viewport = _event.detail;
+        //graph = viewport.getBranch();
         console.log(viewport);
         console.log(graph);
         controllableObjects = graph.getChildrenByName("Level")[0]
@@ -71,23 +107,25 @@ var TheYourneyOfY;
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Movables")[0]
             .getChildrenByName("Controllables")[0];
-        borderObjects = graph.getChildrenByName("Level")[0]
+        groundObjects = graph.getChildrenByName("Level")[0]
             .getChildrenByName("Surroundings")[0]
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Non-Movables")[0]
-            .getChildrenByName("MovementBorder")[0];
+            .getChildrenByName("Ground")[0];
         swoshSound = graph.getChildrenByName("Level")[0]
             .getChildrenByName("Sounds")[0]
             .getChildrenByName("swosh")[0];
         f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
-        spawnPlayer();
+        // spawnPlayer();
         viewport.getCanvas().addEventListener("mousemove", mouseHoverHandler);
         viewport.getCanvas().addEventListener("mousedown", mouseDownHandler);
         viewport.getCanvas().addEventListener("mousemove", mouseMoveHandler);
         viewport.getCanvas().addEventListener("mouseup", mouseUpHandler);
         viewport.getCanvas().addEventListener("wheel", scrollHandler);
+        viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
+        initializeCollisionGroups();
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
@@ -95,18 +133,12 @@ var TheYourneyOfY;
             f.Physics.world.simulate(); // if physics is included and used
         }
         viewport.draw();
-        //zoom in
-        // f.Debug.info("update loop");
-        if (currentZoomLevel < desiredZoomLevel) {
-            currentZoomLevel++;
-            cmpCamera.mtxPivot.translateZ(1);
-        }
         f.AudioManager.default.update();
     }
     function mouseHoverHandler(_event) {
         let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
         if (!objectSelected) {
-            f.Debug.info("No object selected");
+            //f.Debug.info("No object selected");
             for (let controllableObject of controllableObjects.getIterator()) {
                 if (controllableObject.name == "Controllables") {
                     continue; //ignoring parent object since it cannot be moved and causes problems otherwise
@@ -186,50 +218,34 @@ var TheYourneyOfY;
         controlledObject = null;
     }
     async function setup() {
-        console.log("setting up...");
-        await FudgeCore.Project.loadResourcesFromHTML();
-        let graph = f.Project.resources[graphId];
-        // setup the viewport
-        cmpCamera = new FudgeCore.ComponentCamera();
-        cmpCamera.mtxPivot.rotateY(180);
-        cmpCamera.mtxPivot.translateZ(currentZoomLevel);
-        let canvas = document.querySelector("canvas");
-        graph.addComponent(cmpCamera);
-        let viewport = new FudgeCore.Viewport();
-        viewport.initialize("Viewport", graph, cmpCamera, canvas);
-        FudgeCore.Debug.log("Viewport:", viewport);
-        // hide the cursor when interacting, also suppressing right-click menu
-        //canvas.addEventListener("mousedown", canvas.requestPointerLock);
-        //canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
-        // make the camera interactive (complex method in FudgeAid)
-        //FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
-        // setup audio
-        let cmpListener = new f.ComponentAudioListener();
-        cmpCamera.node.addComponent(cmpListener);
-        FudgeCore.AudioManager.default.listenWith(cmpListener);
-        FudgeCore.AudioManager.default.listenTo(graph);
-        FudgeCore.Debug.log("Audio:", FudgeCore.AudioManager.default);
-        // draw viewport once for immediate feedback
-        viewport.draw();
+        canvas = document.querySelector("canvas");
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     }
-    function spawnPlayer() {
-        player = new TheYourneyOfY.Player();
-        graph.getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(player);
+    function initializeCollisionGroups() {
+        // ground
+        groundObjects.getChildren().forEach(function (groundObject) {
+            groundObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_2;
+        });
+        controllableObjects.getChildren().forEach(function (controllableObject) {
+            controllableObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_3;
+        });
+        controllableObjects.getChildren().forEach(function (controllableObject) {
+            f.Debug.info("Collisiongroup: ");
+            f.Debug.info(controllableObject.getComponent(f.ComponentRigidbody).collisionGroup);
+        });
     }
 })(TheYourneyOfY || (TheYourneyOfY = {}));
 var TheYourneyOfY;
 (function (TheYourneyOfY) {
     var f = FudgeCore;
     class Player extends f.Node {
-        health = 1;
         name = "Agent Smith";
-        mesh;
         ctrForward;
-        deltaTime;
+        rigidbody;
+        isOnGround;
         constructor() {
             super("Player");
-            this.ctrForward = this.ctrForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
+            this.ctrForward = this.ctrForward = new f.Control("Forward", 10, 0 /* PROPORTIONAL */);
             this.ctrForward.setDelay(200);
             this.initiatePositionAndScale();
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
@@ -238,9 +254,15 @@ var TheYourneyOfY;
             this.addComponent(new f.ComponentTransform);
             this.addComponent(new f.ComponentMesh(new f.MeshCube("Player")));
             this.addComponent(new f.ComponentMaterial(new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1)))));
-            this.addComponent(new f.ComponentRigidbody());
-            this.getComponent(f.ComponentRigidbody).initialization = 2; //TO_PIVOT
-            this.getComponent(f.ComponentRigidbody).effectGravity = 1;
+            this.rigidbody = new f.ComponentRigidbody();
+            this.addComponent(this.rigidbody);
+            this.rigidbody.initialization = f.BODY_INIT.TO_PIVOT; //TO_PIVOT
+            this.rigidbody.effectGravity = 1;
+            this.rigidbody.typeBody = f.BODY_TYPE.DYNAMIC;
+            this.rigidbody.mass = 1;
+            this.rigidbody.effectRotation = new f.Vector3(0, 0, 0);
+            this.rigidbody.typeCollider = f.COLLIDER_TYPE.CUBE;
+            this.rigidbody.collisionGroup = f.COLLISION_GROUP.GROUP_1;
             //set position
             this.mtxLocal.translateZ(0);
             this.mtxLocal.translateY(4);
@@ -249,31 +271,80 @@ var TheYourneyOfY;
             this.mtxLocal.scale(f.Vector3.ONE(0.5));
         }
         update = (_event) => {
-            this.deltaTime = f.Loop.timeFrameReal / 1000;
             this.handlePlayerMovement();
         };
         handlePlayerMovement() {
+            // Forward
             let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
             this.ctrForward.setInput(forward);
-            this.getComponent(f.ComponentRigidbody).applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
-            console.log(this.ctrForward.getOutput());
-            //this.ctrForward.setInput(configurations.initialspeed);
-            //this.getComponent(f.ComponentRigidbody).applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrlForward.getOutput()));
-            /*
-            f.Debug.info("player-movement");
-            let inputValue: number = (
-                f.Keyboard.mapToValue(-5, 0, [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT])
-                + f.Keyboard.mapToValue(5, 0, [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT])
-            );
-
-
-            this.ctrForward.setInput(inputValue * this.deltaTime);
-            this.mtxLocal.translateY(this.ctrForward.getOutput());
-            //console.log(this.ctrForward.getOutput())
-
-             */
+            this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
+            //console.log(this.ctrForward.getOutput());
+            this.isOnGround = false;
+            let playerCollisions = this.rigidbody.collisions;
+            playerCollisions.forEach(collider => {
+                f.Debug.info("Collider: " + collider.node.name);
+                switch (collider.collisionGroup) {
+                    case f.COLLISION_GROUP.GROUP_2: //Ground elements
+                        this.isOnGround = true;
+                        break;
+                    case f.COLLISION_GROUP.GROUP_3: //Obstacles
+                        this.isOnGround = true;
+                        break;
+                    default:
+                        break;
+                }
+            });
+            // Jump (using simple keyboard event instead of control since it´s easier in this case)
+            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround) {
+                f.Debug.info("Lets goooooo");
+                let velocity = this.rigidbody.getVelocity();
+                velocity.y = 2;
+                this.rigidbody.setVelocity(velocity);
+            }
         }
     }
     TheYourneyOfY.Player = Player;
+})(TheYourneyOfY || (TheYourneyOfY = {}));
+var TheYourneyOfY;
+(function (TheYourneyOfY) {
+    var f = FudgeCore;
+    var ComponentTransform = FudgeCore.ComponentTransform;
+    f.Project.registerScriptNamespace(TheYourneyOfY); // Register the namespace to FUDGE for serialization
+    class CameraMovementScript extends f.ComponentScript {
+        // Register the script as component for use in the editor via drag&drop
+        static iSubclass = f.Component.registerSubclass(CameraMovementScript);
+        // Properties may be mutated by users in the editor via the automatically created user interface
+        message = "CameraMovementScript added to ";
+        constructor() {
+            super();
+            // Don't start when running in editor
+            if (f.Project.mode == f.MODE.EDITOR)
+                return;
+            // Listen to this component being added to or removed from a node
+            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+        }
+        // Activate the functions of this component as response to events
+        hndEvent = (_event) => {
+            switch (_event.type) {
+                case "componentAdd" /* COMPONENT_ADD */:
+                    f.Debug.log(this.message, this.node);
+                    this.start();
+                    break;
+                case "componentRemove" /* COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                    break;
+            }
+        };
+        start() {
+            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+        }
+        update = (_event) => {
+            let moveVector = f.Vector3.DIFFERENCE(TheYourneyOfY.player.mtxLocal.translation, this.node.getComponent(ComponentTransform).mtxLocal.translation);
+            this.node.getComponent(ComponentTransform).mtxLocal.translate(moveVector);
+        };
+    }
+    TheYourneyOfY.CameraMovementScript = CameraMovementScript;
 })(TheYourneyOfY || (TheYourneyOfY = {}));
 //# sourceMappingURL=Script.js.map
