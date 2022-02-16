@@ -1,4 +1,8 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST');
+header("Access-Control-Allow-Headers: X-Requested-With");
+
 if (isset($_GET['mode']) && !empty($_GET['mode'])) {
     $mode = $_GET["mode"];
     $pdo = new PDO('mysql:host=localhost;dbname=prima', 'user', 'pw');

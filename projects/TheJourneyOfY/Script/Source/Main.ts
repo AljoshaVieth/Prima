@@ -27,7 +27,7 @@ namespace TheYourneyOfY {
     let cameraNode: f.Node;
     let apiURL: string;
     let dataHandler: DataHandler;
-
+    let playerstats: PlayerStat[];
 
     let activatePhysics: boolean = true;
     let body: HTMLBodyElement;
@@ -121,7 +121,6 @@ namespace TheYourneyOfY {
 
         f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         initializeCollisionGroups();
-
         f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
 
@@ -239,9 +238,11 @@ namespace TheYourneyOfY {
         apiURL = config.apiURL;
         f.Debug.info("apiURL: " + apiURL);
 
-        let stats = await dataHandler.parseStats(apiURL);
-        stats.forEach(function (playerStat){
-            f.Debug.info(playerStat.name);
+        playerstats = await dataHandler.parseStats(apiURL);
+
+        //TODO move to end
+        playerstats.forEach(function (playerStat){
+            f.Debug.info(playerStat.name  + ": " + playerStat.score);
         })
     }
 

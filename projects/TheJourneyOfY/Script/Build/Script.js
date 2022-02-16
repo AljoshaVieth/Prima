@@ -104,6 +104,7 @@ var TheYourneyOfY;
     let cameraNode;
     let apiURL;
     let dataHandler;
+    let playerstats;
     let activatePhysics = true;
     let body;
     async function start(_event) {
@@ -275,9 +276,10 @@ var TheYourneyOfY;
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
         f.Debug.info("apiURL: " + apiURL);
-        let stats = await dataHandler.parseStats(apiURL);
-        stats.forEach(function (playerStat) {
-            f.Debug.info(playerStat.name);
+        playerstats = await dataHandler.parseStats(apiURL);
+        //TODO move to end
+        playerstats.forEach(function (playerStat) {
+            f.Debug.info(playerStat.name + ": " + playerStat.score);
         });
     }
     function initializeCollisionGroups() {
@@ -378,9 +380,12 @@ var TheYourneyOfY;
             }
         }
         async parseStats(apiUrl) {
-            let stats = await this.loadJson(apiUrl);
-            let parsedStats = JSON.parse(stats);
-            return parsedStats;
+            let stats = await this.loadJson(apiUrl + "?mode=get");
+            let playerStats = [];
+            for (let i = 0; i < stats.length; i++) {
+                playerStats[i] = stats[i];
+            }
+            return playerStats;
         }
     }
     TheYourneyOfY.DataHandler = DataHandler;

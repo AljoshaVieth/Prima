@@ -1,8 +1,5 @@
 namespace TheYourneyOfY {
 
-    export interface Stats {
-        playerstats: PlayerStat[];
-    }
     export interface PlayerStat {
         name: string;
         score: number;
@@ -20,10 +17,13 @@ namespace TheYourneyOfY {
             }
         }
 
-        async parseStats(apiUrl: string){
-            let stats: string = await this.loadJson(apiUrl);
-            let parsedStats : Array<PlayerStat> = JSON.parse(stats);
-           return parsedStats;
+        async parseStats(apiUrl: string) {
+            let stats = await this.loadJson(apiUrl + "?mode=get");
+            let playerStats: PlayerStat[] = [];
+            for (let i = 0; i < stats.length; i++) {
+                playerStats[i] = stats[i];
+            }
+            return playerStats;
         }
 
 
