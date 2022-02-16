@@ -7,6 +7,7 @@ namespace TheJourneyOfY {
         private rigidbody: f.ComponentRigidbody;
         private isOnGround: boolean;
         private idealPosition: f.Vector3;
+        private xSpeed: number;
 
 
         constructor() {
@@ -52,12 +53,13 @@ namespace TheJourneyOfY {
             // Forward
             let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
             this.ctrForward.setInput(forward);
+            f.Debug.info("speed " + this.ctrForward.getOutput());
             this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
             //console.log(this.ctrForward.getOutput());
-            this.rigidbody.getPosition().z = 10;
             this.isOnGround = false;
             let playerCollisions: f.ComponentRigidbody[] = this.rigidbody.collisions;
             f.Debug.info(playerCollisions.length);
+
 
 
             playerCollisions.forEach(collider => {
@@ -72,7 +74,8 @@ namespace TheJourneyOfY {
                     case f.COLLISION_GROUP.GROUP_4: //LethalObjects
                         //TODO die! create event
                         //alert("YOU ARE DEAD!");
-                        f.Debug.info("YOU ARE DEAD");
+                        const playerDeathEvent = new Event("PlayerDeathEvent", {"bubbles":true, "cancelable":false});
+                        this.dispatchEvent(playerDeathEvent);
                         break;
                     default:
                         break;
@@ -91,13 +94,15 @@ namespace TheJourneyOfY {
                 this.rigidbody.translateBody(moveVector);
             }
 
+            if(this.rigidbody.getVelocity().x >= 5){
+                this.rigidbody.setVelocity(new f.Vector3(5,this.rigidbody.getVelocity().y,this.rigidbody.getVelocity().z));
+            }
+
+
             // Jump (using simple keyboard event instead of control since it´s easier in this case)
             if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround) {
                 f.Debug.info("Lets goooooo");
                 this.rigidbody.applyForce(new f.Vector3(0, 30, 0));
-                //let velocity: f.Vector3 = this.rigidbody.getVelocity();
-                //velocity.y = 2;
-                //this.rigidbody.setVelocity(velocity);
             }
         }
     }

@@ -52,12 +52,6 @@ namespace TheJourneyOfY {
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
         viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(player);
         FudgeCore.Debug.log("Viewport:", viewport);
-        //cameraNode.addComponent(new CameraScript);
-        // hide the cursor when interacting, also suppressing right-click menu
-        //canvas.addEventListener("mousedown", canvas.requestPointerLock);
-        //canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
-        // make the camera interactive (complex method in FudgeAid)
-        //FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
 
         // setup audio
         let cmpListener = new f.ComponentAudioListener();
@@ -113,6 +107,7 @@ namespace TheJourneyOfY {
 
         f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
 
+        graph.addEventListener("PlayerDeathEvent", onPlayerDeath);
 
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         // spawnPlayer();
@@ -144,6 +139,11 @@ namespace TheJourneyOfY {
         }
 
         f.AudioManager.default.update();
+    }
+
+    function onPlayerDeath(_event: Event): void{
+        f.Debug.info("!YOU ARE DEAD");
+        f.Loop.stop();
     }
 
     function mouseHoverHandler(_event: MouseEvent): void {

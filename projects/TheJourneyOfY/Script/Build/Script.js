@@ -123,12 +123,6 @@ var TheJourneyOfY;
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
         viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(TheJourneyOfY.player);
         FudgeCore.Debug.log("Viewport:", viewport);
-        //cameraNode.addComponent(new CameraScript);
-        // hide the cursor when interacting, also suppressing right-click menu
-        //canvas.addEventListener("mousedown", canvas.requestPointerLock);
-        //canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
-        // make the camera interactive (complex method in FudgeAid)
-        //FudgeAid.Viewport.expandCameraToInteractiveOrbit(viewport);
         // setup audio
         let cmpListener = new f.ComponentAudioListener();
         //cmpCamera.node.addComponent(cmpListener);
@@ -169,6 +163,7 @@ var TheJourneyOfY;
             .getChildrenByName("Sounds")[0]
             .getChildrenByName("swosh")[0];
         f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
+        graph.addEventListener("PlayerDeathEvent", onPlayerDeath);
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         // spawnPlayer();
         viewport.getCanvas().addEventListener("mousemove", mouseHoverHandler);
@@ -192,6 +187,10 @@ var TheJourneyOfY;
             cmpCamera.mtxPivot.translateZ(1);
         }
         f.AudioManager.default.update();
+    }
+    function onPlayerDeath(_event) {
+        f.Debug.info("!YOU ARE DEAD");
+        f.Loop.stop();
     }
     function mouseHoverHandler(_event) {
         let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
@@ -314,6 +313,7 @@ var TheJourneyOfY;
         rigidbody;
         isOnGround;
         idealPosition;
+        xSpeed;
         constructor() {
             super("Player");
             this.ctrForward = this.ctrForward = new f.Control("Forward", 5, 0 /* PROPORTIONAL */);
@@ -348,9 +348,9 @@ var TheJourneyOfY;
             // Forward
             let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
             this.ctrForward.setInput(forward);
+            f.Debug.info("speed " + this.ctrForward.getOutput());
             this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
             //console.log(this.ctrForward.getOutput());
-            this.rigidbody.getPosition().z = 10;
             this.isOnGround = false;
             let playerCollisions = this.rigidbody.collisions;
             f.Debug.info(playerCollisions.length);
@@ -366,7 +366,8 @@ var TheJourneyOfY;
                     case f.COLLISION_GROUP.GROUP_4: //LethalObjects
                         //TODO die! create event
                         //alert("YOU ARE DEAD!");
-                        f.Debug.info("YOU ARE DEAD");
+                        const playerDeathEvent = new Event("PlayerDeathEvent", { "bubbles": true, "cancelable": false });
+                        this.dispatchEvent(playerDeathEvent);
                         break;
                     default:
                         break;
@@ -383,13 +384,13 @@ var TheJourneyOfY;
                 let moveVector = f.Vector3.DIFFERENCE(this.idealPosition, this.rigidbody.getPosition());
                 this.rigidbody.translateBody(moveVector);
             }
+            if (this.rigidbody.getVelocity().x >= 5) {
+                this.rigidbody.setVelocity(new f.Vector3(5, this.rigidbody.getVelocity().y, this.rigidbody.getVelocity().z));
+            }
             // Jump (using simple keyboard event instead of control since it´s easier in this case)
             if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround) {
                 f.Debug.info("Lets goooooo");
                 this.rigidbody.applyForce(new f.Vector3(0, 30, 0));
-                //let velocity: f.Vector3 = this.rigidbody.getVelocity();
-                //velocity.y = 2;
-                //this.rigidbody.setVelocity(velocity);
             }
         }
     }
