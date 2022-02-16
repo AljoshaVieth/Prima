@@ -1,7 +1,7 @@
-namespace TheYourneyOfY {
+namespace TheJourneyOfY {
     import f = FudgeCore;
     import ComponentTransform = FudgeCore.ComponentTransform;
-    f.Project.registerScriptNamespace(TheYourneyOfY);  // Register the namespace to FUDGE for serialization
+    f.Project.registerScriptNamespace(TheJourneyOfY);  // Register the namespace to FUDGE for serialization
 
     export class CameraMovementScript extends f.ComponentScript {
         // Register the script as component for use in the editor via drag&drop

@@ -1,4 +1,4 @@
-namespace TheYourneyOfY {
+namespace TheJourneyOfY {
 
     export interface PlayerStat {
         name: string;

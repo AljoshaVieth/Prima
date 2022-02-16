@@ -1,4 +1,4 @@
-namespace TheYourneyOfY {
+namespace TheJourneyOfY {
     // import * as configJson from "../../config.json"; // This import style requires "esModuleInterop" (tsconfig: "resolveJsonModule": true, "esModuleInterop": true) TypeScript 2.9+
     import f = FudgeCore;
     import Vector3 = FudgeCore.Vector3;
@@ -20,8 +20,9 @@ namespace TheYourneyOfY {
     export let player: Player;
     let controllableObjects: f.Node;
     let groundObjects: f.Node;
-    let hoveredObject: f.Node = null;
-    let controlledObject: f.Node = null;
+    let lethalObjects: f.Node;
+    let hoveredObject: f.Node;
+    let controlledObject: f.Node;
     let swoshSound: f.Node;
     let cmpCamera: f.ComponentCamera;
     let cameraNode: f.Node;
@@ -98,6 +99,12 @@ namespace TheYourneyOfY {
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Non-Movables")[0]
             .getChildrenByName("Ground")[0];
+
+        lethalObjects = graph.getChildrenByName("Level")[0]
+            .getChildrenByName("Surroundings")[0]
+            .getChildrenByName("Foreground")[0]
+            .getChildrenByName("Non-Movables")[0]
+            .getChildrenByName("LethalObjects")[0];
 
 
         swoshSound = graph.getChildrenByName("Level")[0]
@@ -251,6 +258,11 @@ namespace TheYourneyOfY {
         groundObjects.getChildren().forEach(function (groundObject: Node) {
             groundObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_2;
         });
+
+        lethalObjects.getChildren().forEach(function (lethalObject: Node) {
+            lethalObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_4;
+        });
+
         controllableObjects.getChildren().forEach(function (controllableObject: Node) {
             controllableObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_3;
         });

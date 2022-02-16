@@ -1,4 +1,4 @@
-namespace TheYourneyOfY {
+namespace TheJourneyOfY {
     import f = FudgeCore;
 
     export class Player extends f.Node {
@@ -6,6 +6,7 @@ namespace TheYourneyOfY {
         private ctrForward: f.Control;
         private rigidbody: f.ComponentRigidbody;
         private isOnGround: boolean;
+        private idealPosition: f.Vector3;
 
 
         constructor() {
@@ -53,9 +54,12 @@ namespace TheYourneyOfY {
             this.ctrForward.setInput(forward);
             this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
             //console.log(this.ctrForward.getOutput());
-
+            this.rigidbody.getPosition().z = 10;
             this.isOnGround = false;
             let playerCollisions: f.ComponentRigidbody[] = this.rigidbody.collisions;
+            f.Debug.info(playerCollisions.length);
+
+
             playerCollisions.forEach(collider => {
                 f.Debug.info("Collider: " + collider.node.name);
                 switch (collider.collisionGroup) {
@@ -65,15 +69,32 @@ namespace TheYourneyOfY {
                     case f.COLLISION_GROUP.GROUP_3: //Obstacles
                         this.isOnGround = true;
                         break;
+                    case f.COLLISION_GROUP.GROUP_4: //LethalObjects
+                        //TODO die! create event
+                        //alert("YOU ARE DEAD!");
+                        f.Debug.info("YOU ARE DEAD");
+                        break;
                     default:
                         break;
                 }
             });
 
+            /**
+             * Sometimes the player leaves the z=0 position, even tough the z axis should be locked.
+             * This sometimes causes problems with the jump, so the workaround is to make sure the player is
+             * always on z=0 by constantly teleporting him if he is not.
+             */
+            if(this.rigidbody.getPosition().z != 0.00){
+                this.idealPosition = this.rigidbody.getPosition();
+                this.idealPosition.z = 0;
+                let moveVector: f.Vector3 = f.Vector3.DIFFERENCE(this.idealPosition, this.rigidbody.getPosition());
+                this.rigidbody.translateBody(moveVector);
+            }
+
             // Jump (using simple keyboard event instead of control since it´s easier in this case)
-            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround){
+            if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround) {
                 f.Debug.info("Lets goooooo");
-                this.rigidbody.applyForce(new f.Vector3(0,20,0));
+                this.rigidbody.applyForce(new f.Vector3(0, 30, 0));
                 //let velocity: f.Vector3 = this.rigidbody.getVelocity();
                 //velocity.y = 2;
                 //this.rigidbody.setVelocity(velocity);

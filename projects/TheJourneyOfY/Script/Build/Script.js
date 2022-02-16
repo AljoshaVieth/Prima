@@ -1,9 +1,9 @@
 "use strict";
-var TheYourneyOfY;
-(function (TheYourneyOfY) {
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
     var f = FudgeCore;
     var ComponentTransform = FudgeCore.ComponentTransform;
-    f.Project.registerScriptNamespace(TheYourneyOfY); // Register the namespace to FUDGE for serialization
+    f.Project.registerScriptNamespace(TheJourneyOfY); // Register the namespace to FUDGE for serialization
     class CameraMovementScript extends f.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
         static iSubclass = f.Component.registerSubclass(CameraMovementScript);
@@ -35,13 +35,13 @@ var TheYourneyOfY;
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         }
         update = (_event) => {
-            let moveVector = f.Vector3.DIFFERENCE(TheYourneyOfY.player.mtxLocal.translation, this.node.getComponent(ComponentTransform).mtxLocal.translation);
+            let moveVector = f.Vector3.DIFFERENCE(TheJourneyOfY.player.mtxLocal.translation, this.node.getComponent(ComponentTransform).mtxLocal.translation);
             moveVector.y = 0;
             this.node.getComponent(ComponentTransform).mtxLocal.translate(moveVector);
         };
     }
-    TheYourneyOfY.CameraMovementScript = CameraMovementScript;
-})(TheYourneyOfY || (TheYourneyOfY = {}));
+    TheJourneyOfY.CameraMovementScript = CameraMovementScript;
+})(TheJourneyOfY || (TheJourneyOfY = {}));
 var TheYourneyOfY;
 (function (TheYourneyOfY) {
     var ƒ = FudgeCore;
@@ -79,8 +79,8 @@ var TheYourneyOfY;
     }
     TheYourneyOfY.CustomComponentScript = CustomComponentScript;
 })(TheYourneyOfY || (TheYourneyOfY = {}));
-var TheYourneyOfY;
-(function (TheYourneyOfY) {
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
     // import * as configJson from "../../config.json"; // This import style requires "esModuleInterop" (tsconfig: "resolveJsonModule": true, "esModuleInterop": true) TypeScript 2.9+
     var f = FudgeCore;
     var Vector3 = FudgeCore.Vector3;
@@ -97,8 +97,9 @@ var TheYourneyOfY;
     let hoveringOverControllableObject = false;
     let controllableObjects;
     let groundObjects;
-    let hoveredObject = null;
-    let controlledObject = null;
+    let lethalObjects;
+    let hoveredObject;
+    let controlledObject;
     let swoshSound;
     let cmpCamera;
     let cameraNode;
@@ -117,10 +118,10 @@ var TheYourneyOfY;
         cmpCamera.mtxPivot.translateZ(-30);
         //graph.addComponent(cmpCamera);
         viewport = new f.Viewport();
-        TheYourneyOfY.player = new TheYourneyOfY.Player();
+        TheJourneyOfY.player = new TheJourneyOfY.Player();
         f.Debug.info("Spawned Player");
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
-        viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(TheYourneyOfY.player);
+        viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(TheJourneyOfY.player);
         FudgeCore.Debug.log("Viewport:", viewport);
         //cameraNode.addComponent(new CameraScript);
         // hide the cursor when interacting, also suppressing right-click menu
@@ -135,7 +136,7 @@ var TheYourneyOfY;
         cameraNode = new f.Node("cameraNode");
         cameraNode.addComponent(cmpCamera);
         cameraNode.addComponent(new f.ComponentTransform);
-        cameraNode.addComponent(new TheYourneyOfY.CameraMovementScript());
+        cameraNode.addComponent(new TheJourneyOfY.CameraMovementScript());
         //cameraNode.addComponent(cmpListener);
         graph.addChild(cameraNode);
         FudgeCore.AudioManager.default.listenWith(cmpListener);
@@ -159,6 +160,11 @@ var TheYourneyOfY;
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Non-Movables")[0]
             .getChildrenByName("Ground")[0];
+        lethalObjects = graph.getChildrenByName("Level")[0]
+            .getChildrenByName("Surroundings")[0]
+            .getChildrenByName("Foreground")[0]
+            .getChildrenByName("Non-Movables")[0]
+            .getChildrenByName("LethalObjects")[0];
         swoshSound = graph.getChildrenByName("Level")[0]
             .getChildrenByName("Sounds")[0]
             .getChildrenByName("swosh")[0];
@@ -272,7 +278,7 @@ var TheYourneyOfY;
     async function setup() {
         canvas = document.querySelector("canvas");
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
-        dataHandler = new TheYourneyOfY.DataHandler();
+        dataHandler = new TheJourneyOfY.DataHandler();
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
         f.Debug.info("apiURL: " + apiURL);
@@ -287,6 +293,9 @@ var TheYourneyOfY;
         groundObjects.getChildren().forEach(function (groundObject) {
             groundObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_2;
         });
+        lethalObjects.getChildren().forEach(function (lethalObject) {
+            lethalObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_4;
+        });
         controllableObjects.getChildren().forEach(function (controllableObject) {
             controllableObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_3;
         });
@@ -295,15 +304,16 @@ var TheYourneyOfY;
             f.Debug.info(controllableObject.getComponent(f.ComponentRigidbody).collisionGroup);
         });
     }
-})(TheYourneyOfY || (TheYourneyOfY = {}));
-var TheYourneyOfY;
-(function (TheYourneyOfY) {
+})(TheJourneyOfY || (TheJourneyOfY = {}));
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
     var f = FudgeCore;
     class Player extends f.Node {
         name = "Agent Smith";
         ctrForward;
         rigidbody;
         isOnGround;
+        idealPosition;
         constructor() {
             super("Player");
             this.ctrForward = this.ctrForward = new f.Control("Forward", 5, 0 /* PROPORTIONAL */);
@@ -340,8 +350,10 @@ var TheYourneyOfY;
             this.ctrForward.setInput(forward);
             this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
             //console.log(this.ctrForward.getOutput());
+            this.rigidbody.getPosition().z = 10;
             this.isOnGround = false;
             let playerCollisions = this.rigidbody.collisions;
+            f.Debug.info(playerCollisions.length);
             playerCollisions.forEach(collider => {
                 f.Debug.info("Collider: " + collider.node.name);
                 switch (collider.collisionGroup) {
@@ -351,24 +363,40 @@ var TheYourneyOfY;
                     case f.COLLISION_GROUP.GROUP_3: //Obstacles
                         this.isOnGround = true;
                         break;
+                    case f.COLLISION_GROUP.GROUP_4: //LethalObjects
+                        //TODO die! create event
+                        //alert("YOU ARE DEAD!");
+                        f.Debug.info("YOU ARE DEAD");
+                        break;
                     default:
                         break;
                 }
             });
+            /**
+             * Sometimes the player leaves the z=0 position, even tough the z axis should be locked.
+             * This sometimes causes problems with the jump, so the workaround is to make sure the player is
+             * always on z=0 by constantly teleporting him if he is not.
+             */
+            if (this.rigidbody.getPosition().z != 0.00) {
+                this.idealPosition = this.rigidbody.getPosition();
+                this.idealPosition.z = 0;
+                let moveVector = f.Vector3.DIFFERENCE(this.idealPosition, this.rigidbody.getPosition());
+                this.rigidbody.translateBody(moveVector);
+            }
             // Jump (using simple keyboard event instead of control since it´s easier in this case)
             if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE]) && this.isOnGround) {
                 f.Debug.info("Lets goooooo");
-                this.rigidbody.applyForce(new f.Vector3(0, 20, 0));
+                this.rigidbody.applyForce(new f.Vector3(0, 30, 0));
                 //let velocity: f.Vector3 = this.rigidbody.getVelocity();
                 //velocity.y = 2;
                 //this.rigidbody.setVelocity(velocity);
             }
         }
     }
-    TheYourneyOfY.Player = Player;
-})(TheYourneyOfY || (TheYourneyOfY = {}));
-var TheYourneyOfY;
-(function (TheYourneyOfY) {
+    TheJourneyOfY.Player = Player;
+})(TheJourneyOfY || (TheJourneyOfY = {}));
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
     class DataHandler {
         async loadJson(path) {
             try {
@@ -388,6 +416,6 @@ var TheYourneyOfY;
             return playerStats;
         }
     }
-    TheYourneyOfY.DataHandler = DataHandler;
-})(TheYourneyOfY || (TheYourneyOfY = {}));
+    TheJourneyOfY.DataHandler = DataHandler;
+})(TheJourneyOfY || (TheJourneyOfY = {}));
 //# sourceMappingURL=Script.js.map
