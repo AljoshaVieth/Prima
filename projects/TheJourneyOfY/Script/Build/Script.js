@@ -81,6 +81,29 @@ var TheYourneyOfY;
 })(TheYourneyOfY || (TheYourneyOfY = {}));
 var TheJourneyOfY;
 (function (TheJourneyOfY) {
+    class DataHandler {
+        async loadJson(path) {
+            try {
+                const response = await fetch(path);
+                return await response.json();
+            }
+            catch (error) {
+                return error;
+            }
+        }
+        async parseStats(apiUrl) {
+            let stats = await this.loadJson(apiUrl + "?mode=get");
+            let playerStats = [];
+            for (let i = 0; i < stats.length; i++) {
+                playerStats[i] = stats[i];
+            }
+            return playerStats;
+        }
+    }
+    TheJourneyOfY.DataHandler = DataHandler;
+})(TheJourneyOfY || (TheJourneyOfY = {}));
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
     // import * as configJson from "../../config.json"; // This import style requires "esModuleInterop" (tsconfig: "resolveJsonModule": true, "esModuleInterop": true) TypeScript 2.9+
     var f = FudgeCore;
     var Vector3 = FudgeCore.Vector3;
@@ -307,6 +330,7 @@ var TheJourneyOfY;
 var TheJourneyOfY;
 (function (TheJourneyOfY) {
     var f = FudgeCore;
+    var ComponentMaterial = FudgeCore.ComponentMaterial;
     class Player extends f.Node {
         name = "Agent Smith";
         ctrForward;
@@ -324,7 +348,12 @@ var TheJourneyOfY;
         initiatePositionAndScale() {
             this.addComponent(new f.ComponentTransform);
             this.addComponent(new f.ComponentMesh(new f.MeshCube("Player")));
-            this.addComponent(new f.ComponentMaterial(new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1)))));
+            //this.addComponent(new f.ComponentMaterial(
+            //    new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1))))
+            //);
+            let textureImage = new f.TextureImage("Textures/playerlowpoly.png");
+            let playerMaterial = new f.Material("PlayerMaterial", f.ShaderTexture, new f.CoatTextured(new f.Color(1, 1, 1), textureImage));
+            this.addComponent(new ComponentMaterial(playerMaterial));
             this.rigidbody = new f.ComponentRigidbody();
             this.addComponent(this.rigidbody);
             this.rigidbody.initialization = f.BODY_INIT.TO_PIVOT; //TO_PIVOT
@@ -395,28 +424,5 @@ var TheJourneyOfY;
         }
     }
     TheJourneyOfY.Player = Player;
-})(TheJourneyOfY || (TheJourneyOfY = {}));
-var TheJourneyOfY;
-(function (TheJourneyOfY) {
-    class DataHandler {
-        async loadJson(path) {
-            try {
-                const response = await fetch(path);
-                return await response.json();
-            }
-            catch (error) {
-                return error;
-            }
-        }
-        async parseStats(apiUrl) {
-            let stats = await this.loadJson(apiUrl + "?mode=get");
-            let playerStats = [];
-            for (let i = 0; i < stats.length; i++) {
-                playerStats[i] = stats[i];
-            }
-            return playerStats;
-        }
-    }
-    TheJourneyOfY.DataHandler = DataHandler;
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 //# sourceMappingURL=Script.js.map

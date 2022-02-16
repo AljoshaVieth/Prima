@@ -1,5 +1,6 @@
 namespace TheJourneyOfY {
     import f = FudgeCore;
+    import ComponentMaterial = FudgeCore.ComponentMaterial;
 
     export class Player extends f.Node {
         public name: string = "Agent Smith";
@@ -21,9 +22,12 @@ namespace TheJourneyOfY {
         private initiatePositionAndScale(): void {
             this.addComponent(new f.ComponentTransform);
             this.addComponent(new f.ComponentMesh(new f.MeshCube("Player")));
-            this.addComponent(new f.ComponentMaterial(
-                new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1))))
-            );
+            //this.addComponent(new f.ComponentMaterial(
+            //    new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1))))
+            //);
+            let textureImage: f.TextureImage = new f.TextureImage("Textures/playerlowpoly.png");
+           let playerMaterial: f.Material = new f.Material("PlayerMaterial", f.ShaderTexture, new f.CoatTextured(new f.Color(1,1,1), textureImage));
+           this.addComponent(new ComponentMaterial(playerMaterial));
             this.rigidbody = new f.ComponentRigidbody();
             this.addComponent(this.rigidbody);
 

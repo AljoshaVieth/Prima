@@ -14,7 +14,7 @@
       "coat": {
         "ƒ.CoatTextured": {
           "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2022-01-08T15:57:06.095Z|59238"
+          "idTexture": "TextureImage|2022-02-16T19:41:19.342Z|72362"
         }
       }
     }
@@ -56,7 +56,7 @@
       "coat": {
         "ƒ.CoatTextured": {
           "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2022-01-08T16:02:46.414Z|97543"
+          "idTexture": "TextureImage|2022-02-16T19:41:59.510Z|04445"
         }
       }
     }
@@ -129,7 +129,49 @@
                       "ƒ.Node": {
                         "name": "Background",
                         "components": {},
-                        "children": []
+                        "children": [
+                          {
+                            "ƒ.Node": {
+                              "name": "BackgroundImage",
+                              "components": {
+                                "ComponentMesh": [
+                                  {
+                                    "ƒ.ComponentMesh": {
+                                      "idMesh": "MeshCube|2022-01-08T15:27:19.926Z|11492",
+                                      "pivot": {
+                                        "translation": "[50, -25, -100]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[300, 150, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMaterial": [
+                                  {
+                                    "ƒ.ComponentMaterial": {
+                                      "sortForAlpha": false,
+                                      "clrPrimary": "[1, 1, 1, 1]",
+                                      "clrSecondary": "[1, 1, 1, 1]",
+                                      "pivot": {
+                                        "translation": "[0, 0]",
+                                        "rotation": 0,
+                                        "scaling": "[1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      },
+                                      "idMaterial": "Material|2022-02-16T19:43:31.267Z|11659"
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -958,6 +1000,52 @@
       ],
       "idResource": "Graph|2022-01-08T12:51:22.101Z|15244",
       "type": "Graph"
+    }
+  },
+  "TextureImage|2022-02-16T19:41:19.342Z|72362": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\groundlowpoly.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-02-16T19:41:19.342Z|72362",
+        "name": "Textures\\groundlowpoly.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "TextureImage|2022-02-16T19:41:59.510Z|04445": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\Terrain\\stonelowpoly.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-02-16T19:41:59.510Z|04445",
+        "name": "Textures\\Terrain\\stonelowpoly.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "TextureImage|2022-02-16T19:43:14.656Z|61784": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\backgroundlowpoly.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-02-16T19:43:14.656Z|61784",
+        "name": "Textures\\backgroundlowpoly.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "Material|2022-02-16T19:43:31.267Z|11659": {
+    "ƒ.Material": {
+      "name": "BackgroundImageMaterial",
+      "idResource": "Material|2022-02-16T19:43:31.267Z|11659",
+      "shader": "ShaderTexture",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2022-02-16T19:43:14.656Z|61784"
+        }
+      }
     }
   }
 }
