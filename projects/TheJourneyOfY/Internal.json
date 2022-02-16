@@ -476,9 +476,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[0, -2, 0]",
+                                                    "translation": "[10, -4, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[10, 3, 1]"
+                                                    "scaling": "[30, 5, 2]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -531,9 +531,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[13, -2, 0]",
+                                                    "translation": "[43, -4, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[10, 3, 1]"
+                                                    "scaling": "[30, 5, 2]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -596,7 +596,7 @@
                                                   "pivot": {
                                                     "translation": "[0, 0, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[1, 1, 0.10000000149011612]"
+                                                    "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -642,7 +642,7 @@
                                                     "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
-                                                    "active": false
+                                                    "active": true
                                                   }
                                                 }
                                               }
@@ -651,9 +651,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[0, 3.5300002098083496, -0.5]",
+                                                    "translation": "[20, 2, -0.9999997615814209]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[100, 5, 0.10000000149011612]"
+                                                    "scaling": "[100, 8, 0.10000000149011612]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -676,7 +676,7 @@
                                                   "pivot": {
                                                     "translation": "[0, 0, 0]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[1, 1, 0.10000000149011612]"
+                                                    "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
                                                     "active": true
@@ -722,7 +722,7 @@
                                                     "scaling": "[1, 1, 1]"
                                                   },
                                                   "Component": {
-                                                    "active": false
+                                                    "active": true
                                                   }
                                                 }
                                               }
@@ -731,9 +731,9 @@
                                               {
                                                 "ƒ.ComponentTransform": {
                                                   "local": {
-                                                    "translation": "[0, 3.5300002098083496, 0.5]",
+                                                    "translation": "[20, 2, 0.9999998807907104]",
                                                     "rotation": "[0, 0, 0]",
-                                                    "scaling": "[100, 5, 0.10000000149011612]"
+                                                    "scaling": "[100, 8, 0.10000000149011612]"
                                                   },
                                                   "Component": {
                                                     "active": true

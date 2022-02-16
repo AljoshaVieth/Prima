@@ -26,6 +26,7 @@ namespace TheYourneyOfY {
     let cmpCamera: f.ComponentCamera;
     let cameraNode: f.Node;
     let apiURL: string;
+    let dataHandler: DataHandler;
 
 
     let activatePhysics: boolean = true;
@@ -233,18 +234,15 @@ namespace TheYourneyOfY {
         canvas = document.querySelector("canvas");
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", {bubbles: true, detail: viewport}));
 
-        await loadConfig();
+        dataHandler = new DataHandler();
+        let config = await dataHandler.loadJson("../../config.json");
+        apiURL = config.apiURL;
         f.Debug.info("apiURL: " + apiURL);
-    }
 
-    async function loadConfig() {
-        try {
-            const response = await fetch("../../config.json");
-            const configJson = await response.json();
-            apiURL = configJson.apiURL;
-        } catch (error) {
-            return error;
-        }
+        let stats = await dataHandler.parseStats(apiURL);
+        stats.forEach(function (playerStat){
+            f.Debug.info(playerStat.name);
+        })
     }
 
     function initializeCollisionGroups() {

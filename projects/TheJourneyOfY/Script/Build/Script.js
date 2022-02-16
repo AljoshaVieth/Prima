@@ -36,6 +36,7 @@ var TheYourneyOfY;
         }
         update = (_event) => {
             let moveVector = f.Vector3.DIFFERENCE(TheYourneyOfY.player.mtxLocal.translation, this.node.getComponent(ComponentTransform).mtxLocal.translation);
+            moveVector.y = 0;
             this.node.getComponent(ComponentTransform).mtxLocal.translate(moveVector);
         };
     }
@@ -102,6 +103,7 @@ var TheYourneyOfY;
     let cmpCamera;
     let cameraNode;
     let apiURL;
+    let dataHandler;
     let activatePhysics = true;
     let body;
     async function start(_event) {
@@ -269,18 +271,14 @@ var TheYourneyOfY;
     async function setup() {
         canvas = document.querySelector("canvas");
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
-        await loadConfig();
+        dataHandler = new TheYourneyOfY.DataHandler();
+        let config = await dataHandler.loadJson("../../config.json");
+        apiURL = config.apiURL;
         f.Debug.info("apiURL: " + apiURL);
-    }
-    async function loadConfig() {
-        try {
-            const response = await fetch("../../config.json");
-            const configJson = await response.json();
-            apiURL = configJson.apiURL;
-        }
-        catch (error) {
-            return error;
-        }
+        let stats = await dataHandler.parseStats(apiURL);
+        stats.forEach(function (playerStat) {
+            f.Debug.info(playerStat.name);
+        });
     }
     function initializeCollisionGroups() {
         // ground
@@ -306,7 +304,7 @@ var TheYourneyOfY;
         isOnGround;
         constructor() {
             super("Player");
-            this.ctrForward = this.ctrForward = new f.Control("Forward", 10, 0 /* PROPORTIONAL */);
+            this.ctrForward = this.ctrForward = new f.Control("Forward", 5, 0 /* PROPORTIONAL */);
             this.ctrForward.setDelay(200);
             this.initiatePositionAndScale();
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
@@ -366,5 +364,25 @@ var TheYourneyOfY;
         }
     }
     TheYourneyOfY.Player = Player;
+})(TheYourneyOfY || (TheYourneyOfY = {}));
+var TheYourneyOfY;
+(function (TheYourneyOfY) {
+    class DataHandler {
+        async loadJson(path) {
+            try {
+                const response = await fetch(path);
+                return await response.json();
+            }
+            catch (error) {
+                return error;
+            }
+        }
+        async parseStats(apiUrl) {
+            let stats = await this.loadJson(apiUrl);
+            let parsedStats = JSON.parse(stats);
+            return parsedStats;
+        }
+    }
+    TheYourneyOfY.DataHandler = DataHandler;
 })(TheYourneyOfY || (TheYourneyOfY = {}));
 //# sourceMappingURL=Script.js.map

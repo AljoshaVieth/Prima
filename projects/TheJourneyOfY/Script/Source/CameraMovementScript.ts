@@ -41,6 +41,7 @@ namespace TheYourneyOfY {
 
         public update = (_event: Event): void => {
             let moveVector: f.Vector3 = f.Vector3.DIFFERENCE(player.mtxLocal.translation, this.node.getComponent(ComponentTransform).mtxLocal.translation);
+            moveVector.y = 0;
             this.node.getComponent(ComponentTransform).mtxLocal.translate(moveVector);
         }
     }

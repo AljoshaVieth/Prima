@@ -10,7 +10,7 @@ namespace TheYourneyOfY {
 
         constructor() {
             super("Player");
-            this.ctrForward = this.ctrForward = new f.Control("Forward", 10, f.CONTROL_TYPE.PROPORTIONAL);
+            this.ctrForward = this.ctrForward = new f.Control("Forward", 5, f.CONTROL_TYPE.PROPORTIONAL);
             this.ctrForward.setDelay(200);
             this.initiatePositionAndScale();
             f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
