@@ -235,7 +235,7 @@ namespace TheYourneyOfY {
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", {bubbles: true, detail: viewport}));
 
         dataHandler = new DataHandler();
-        let config = await dataHandler.loadJson("../../config.json");
+        let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
         f.Debug.info("apiURL: " + apiURL);
 
