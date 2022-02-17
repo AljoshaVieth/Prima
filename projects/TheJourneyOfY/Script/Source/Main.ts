@@ -119,7 +119,7 @@ namespace TheJourneyOfY {
         viewport.getCanvas().addEventListener("wheel", scrollHandler);
 
 
-        viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
+        //viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
 
         f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         initializeCollisionGroups();
@@ -271,6 +271,12 @@ namespace TheJourneyOfY {
             f.Debug.info("Collisiongroup: ");
             f.Debug.info(controllableObject.getComponent(f.ComponentRigidbody).collisionGroup);
         });
+
+    }
+
+    function test(){
+        Fud
+        let sprite: FudgeA.SpriteSheetAnimation = new ƒAid.SpriteSheetAnimation(name, _spritesheet);
 
     }
 }

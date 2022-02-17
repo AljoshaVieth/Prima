@@ -194,7 +194,7 @@ var TheJourneyOfY;
         viewport.getCanvas().addEventListener("mousemove", mouseMoveHandler);
         viewport.getCanvas().addEventListener("mouseup", mouseUpHandler);
         viewport.getCanvas().addEventListener("wheel", scrollHandler);
-        viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
+        //viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         initializeCollisionGroups();
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -325,6 +325,10 @@ var TheJourneyOfY;
             f.Debug.info("Collisiongroup: ");
             f.Debug.info(controllableObject.getComponent(f.ComponentRigidbody).collisionGroup);
         });
+    }
+    function test() {
+        Fud;
+        let sprite = new ƒAid.SpriteSheetAnimation(name, _spritesheet);
     }
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 var TheJourneyOfY;
