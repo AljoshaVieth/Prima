@@ -142,9 +142,11 @@ var TheJourneyOfY;
         //graph.addComponent(cmpCamera);
         viewport = new f.Viewport();
         TheJourneyOfY.player = new TheJourneyOfY.Player();
+        let goal = new TheJourneyOfY.GoalObject();
         f.Debug.info("Spawned Player");
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
         viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(TheJourneyOfY.player);
+        viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(goal);
         FudgeCore.Debug.log("Viewport:", viewport);
         // setup audio
         let cmpListener = new f.ComponentAudioListener();
@@ -194,7 +196,7 @@ var TheJourneyOfY;
         viewport.getCanvas().addEventListener("mousemove", mouseMoveHandler);
         viewport.getCanvas().addEventListener("mouseup", mouseUpHandler);
         viewport.getCanvas().addEventListener("wheel", scrollHandler);
-        //viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
+        viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         initializeCollisionGroups();
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -326,10 +328,6 @@ var TheJourneyOfY;
             f.Debug.info(controllableObject.getComponent(f.ComponentRigidbody).collisionGroup);
         });
     }
-    function test() {
-        Fud;
-        let sprite = new ƒAid.SpriteSheetAnimation(name, _spritesheet);
-    }
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 var TheJourneyOfY;
 (function (TheJourneyOfY) {
@@ -428,5 +426,81 @@ var TheJourneyOfY;
         }
     }
     TheJourneyOfY.Player = Player;
+})(TheJourneyOfY || (TheJourneyOfY = {}));
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
+    var f = FudgeCore;
+    var ComponentMaterial = FudgeCore.ComponentMaterial;
+    class GoalObject extends f.Node {
+        componentTransform;
+        constructor() {
+            super("GoalObject");
+            this.initiatePositionAndScale();
+            this.initAnim();
+            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+        }
+        initiatePositionAndScale() {
+            this.componentTransform = new f.ComponentTransform();
+            this.addComponent(this.componentTransform);
+            this.addComponent(new f.ComponentMesh(new f.MeshSphere("GoalObject")));
+            let textureImage = new f.TextureImage("Textures/goallowpoly.png");
+            let goalMaterial = new f.Material("GoalMaterial", f.ShaderTexture, new f.CoatTextured(new f.Color(1, 1, 1), textureImage));
+            this.addComponent(new ComponentMaterial(goalMaterial));
+            //set position
+            this.mtxLocal.translateZ(0);
+            this.mtxLocal.translateY(0);
+            this.mtxLocal.translateX(5);
+            //set scale
+            this.mtxLocal.scale(f.Vector3.ONE(1));
+        }
+        update = (_event) => {
+            this.checkForPlayerPosition();
+        };
+        checkForPlayerPosition() {
+            if (this.mtxLocal.translation.getDistance(TheJourneyOfY.player.mtxLocal.translation) < 0.5) {
+                f.Debug.info("GOAL");
+                //TODO fire event
+            }
+        }
+        initAnim() {
+            let hoveringAnimSeq = new f.AnimationSequence();
+            hoveringAnimSeq.addKey(new f.AnimationKey(0, -1));
+            hoveringAnimSeq.addKey(new f.AnimationKey(3000, 1));
+            hoveringAnimSeq.addKey(new f.AnimationKey(6000, -1));
+            let rotatingAnimSeq = new f.AnimationSequence();
+            rotatingAnimSeq.addKey(new f.AnimationKey(0, 0));
+            rotatingAnimSeq.addKey(new f.AnimationKey(3000, 360));
+            rotatingAnimSeq.addKey(new f.AnimationKey(6000, 0));
+            let animStructure = {
+                components: {
+                    ComponentTransform: [
+                        {
+                            "f.ComponentTransform": {
+                                mtxLocal: {
+                                    rotation: {
+                                        y: rotatingAnimSeq
+                                    },
+                                    translation: {
+                                        y: hoveringAnimSeq
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            };
+            let fps = 30;
+            let animation = new f.Animation("GoalAnimation", animStructure, fps);
+            let cmpAnimator = new f.ComponentAnimator(animation, f.ANIMATION_PLAYMODE.LOOP, f.ANIMATION_PLAYBACK.TIMEBASED_CONTINOUS);
+            cmpAnimator.scale = 1;
+            if (this.getComponent(f.ComponentAnimator)) {
+                this.removeComponent(this.getComponent(f.ComponentAnimator));
+            }
+            this.addComponent(cmpAnimator);
+            cmpAnimator.activate(true);
+            console.log("Component", cmpAnimator);
+        }
+    }
+    TheJourneyOfY.GoalObject = GoalObject;
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 //# sourceMappingURL=Script.js.map

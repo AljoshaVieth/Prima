@@ -30,6 +30,7 @@ namespace TheJourneyOfY {
     let dataHandler: DataHandler;
     let playerstats: PlayerStat[];
 
+
     let activatePhysics: boolean = true;
     let body: HTMLBodyElement;
 
@@ -39,6 +40,8 @@ namespace TheJourneyOfY {
         await FudgeCore.Project.loadResourcesFromHTML();
         graph = <f.Graph>f.Project.resources[graphId];
 
+
+
         // setup the viewport
         cmpCamera = new FudgeCore.ComponentCamera();
         cmpCamera.mtxPivot.rotateY(180);
@@ -46,11 +49,13 @@ namespace TheJourneyOfY {
         //graph.addComponent(cmpCamera);
         viewport = new f.Viewport();
         player = new Player();
+        let goal: GoalObject = new GoalObject();
         f.Debug.info("Spawned Player");
 
 
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
         viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(player);
+        viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(goal);
         FudgeCore.Debug.log("Viewport:", viewport);
 
         // setup audio
@@ -119,7 +124,7 @@ namespace TheJourneyOfY {
         viewport.getCanvas().addEventListener("wheel", scrollHandler);
 
 
-        //viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
+        viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
 
         f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         initializeCollisionGroups();
@@ -274,9 +279,7 @@ namespace TheJourneyOfY {
 
     }
 
-    function test(){
-        Fud
-        let sprite: FudgeA.SpriteSheetAnimation = new ƒAid.SpriteSheetAnimation(name, _spritesheet);
 
-    }
+
+
 }

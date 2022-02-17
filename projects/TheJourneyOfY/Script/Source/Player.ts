@@ -26,8 +26,8 @@ namespace TheJourneyOfY {
             //    new f.Material("materialPlayer", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 1, 1))))
             //);
             let textureImage: f.TextureImage = new f.TextureImage("Textures/playerlowpoly.png");
-           let playerMaterial: f.Material = new f.Material("PlayerMaterial", f.ShaderTexture, new f.CoatTextured(new f.Color(1,1,1), textureImage));
-           this.addComponent(new ComponentMaterial(playerMaterial));
+            let playerMaterial: f.Material = new f.Material("PlayerMaterial", f.ShaderTexture, new f.CoatTextured(new f.Color(1,1,1), textureImage));
+            this.addComponent(new ComponentMaterial(playerMaterial));
             this.rigidbody = new f.ComponentRigidbody();
             this.addComponent(this.rigidbody);
 
