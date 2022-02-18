@@ -111,6 +111,8 @@ namespace TheJourneyOfY {
 
         submitScoreButton.addEventListener("click", function () {
             dataHandler.submitScore(apiURL, timePassed, playerName.value);
+            window.location.reload();
+
 
         });
         console.log("Starting...");
