@@ -21,11 +21,11 @@
 
 
 ## Sounds
-| Sound                                    | Credit                                                                                                                                                                                       |
-|------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Swosh sound (when controlling an object) | [Swoosh 29.wav](https://freesound.org/people/AudioPapkin/sounds/444644/) by user AudioPapkin on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/). |
-| Jump                                     | [jump.wav](https://freesound.org/people/jalastram/sounds/386614/) by user jalastram on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).          |
-| Victory                                  | - [victory.wav](https://freesound.org/people/Kubatko/sounds/336725/) by user Kubatko on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).         |
-| Defeat                                   | - [defeat.wav](https://freesound.org/people/Kubatko/sounds/196584/) by user Kubatko on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).          |
-| Ambient music                            | - [music.wav](https://freesound.org/people/ShortRecord/sounds/522589/) by user ShortRecord on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).   |
+| Sound                                    | Credit                                                                                                                                                                                   |
+|------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Swosh sound (when controlling an object) | [swosh.wav](https://freesound.org/people/AudioPapkin/sounds/444644/) by user AudioPapkin on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/). |
+| Jump                                     | [jump.wav](https://freesound.org/people/jalastram/sounds/386614/) by user jalastram on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).      |
+| Victory                                  | [victory.wav](https://freesound.org/people/Kubatko/sounds/336725/) by user Kubatko on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).       |
+| Defeat                                   | [defeat.wav](https://freesound.org/people/Kubatko/sounds/196584/) by user Kubatko on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).        |
+| Ambient music                            | [music.wav](https://freesound.org/people/ShortRecord/sounds/522589/) by user ShortRecord on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/). |
 
