@@ -3,12 +3,10 @@ namespace TheJourneyOfY {
     import ComponentMaterial = FudgeCore.ComponentMaterial;
 
     export class Player extends f.Node {
-        public name: string = "Agent Smith";
         private ctrForward: f.Control;
         private rigidbody: f.ComponentRigidbody;
         private isOnGround: boolean;
         private idealPosition: f.Vector3;
-        private xSpeed: number;
 
 
         constructor() {
@@ -57,17 +55,17 @@ namespace TheJourneyOfY {
             // Forward
             let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
             this.ctrForward.setInput(forward);
-            f.Debug.info("speed " + this.ctrForward.getOutput());
+           //aaaaaaaada f.Debug.info("speed " + this.ctrForward.getOutput());
             this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
             //console.log(this.ctrForward.getOutput());
             this.isOnGround = false;
             let playerCollisions: f.ComponentRigidbody[] = this.rigidbody.collisions;
-            f.Debug.info(playerCollisions.length);
+            //f.Debug.info(playerCollisions.length);
 
 
 
             playerCollisions.forEach(collider => {
-                f.Debug.info("Collider: " + collider.node.name);
+                //f.Debug.info("Collider: " + collider.node.name);
                 switch (collider.collisionGroup) {
                     case f.COLLISION_GROUP.GROUP_2: //Ground elements
                         this.isOnGround = true;
@@ -76,10 +74,8 @@ namespace TheJourneyOfY {
                         this.isOnGround = true;
                         break;
                     case f.COLLISION_GROUP.GROUP_4: //LethalObjects
-                        //TODO die! create event
-                        //alert("YOU ARE DEAD!");
-                        const playerDeathEvent = new Event("PlayerDeathEvent", {"bubbles":true, "cancelable":false});
-                        this.dispatchEvent(playerDeathEvent);
+                        const gameOverEvent = new GameOverEvent(false);
+                        this.dispatchEvent(gameOverEvent);
                         break;
                     default:
                         break;

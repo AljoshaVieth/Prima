@@ -134,6 +134,39 @@
       }
     }
   },
+  "MeshSphere|2022-02-18T09:31:23.620Z|41189": {
+    "ƒ.MeshSphere": {
+      "idResource": "MeshSphere|2022-02-18T09:31:23.620Z|41189",
+      "name": "GoalMeshSphere",
+      "type": "MeshSphere",
+      "sectors": 8,
+      "stacks": 8
+    }
+  },
+  "Material|2022-02-18T09:31:35.421Z|21395": {
+    "ƒ.Material": {
+      "name": "GoalMaterial",
+      "idResource": "Material|2022-02-18T09:31:35.421Z|21395",
+      "shader": "ShaderTexture",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2022-02-18T09:31:47.248Z|97284"
+        }
+      }
+    }
+  },
+  "TextureImage|2022-02-18T09:31:47.248Z|97284": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\goallowpoly.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-02-18T09:31:47.248Z|97284",
+        "name": "Textures\\goallowpoly.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
   "Graph|2022-01-08T12:51:22.101Z|15244": {
     "ƒ.Graph": {
       "name": "Graph",
@@ -1002,6 +1035,61 @@
                                         }
                                       }
                                     ]
+                                  }
+                                },
+                                {
+                                  "ƒ.Node": {
+                                    "name": "Goal",
+                                    "components": {
+                                      "ComponentMesh": [
+                                        {
+                                          "ƒ.ComponentMesh": {
+                                            "idMesh": "MeshSphere|2022-02-18T09:31:23.620Z|41189",
+                                            "pivot": {
+                                              "translation": "[0, 0, 0]",
+                                              "rotation": "[0, 0, 0]",
+                                              "scaling": "[1, 1, 1]"
+                                            },
+                                            "Component": {
+                                              "active": true
+                                            }
+                                          }
+                                        }
+                                      ],
+                                      "ComponentMaterial": [
+                                        {
+                                          "ƒ.ComponentMaterial": {
+                                            "sortForAlpha": false,
+                                            "clrPrimary": "[1, 1, 1, 1]",
+                                            "clrSecondary": "[1, 1, 1, 1]",
+                                            "pivot": {
+                                              "translation": "[0, 0]",
+                                              "rotation": 0,
+                                              "scaling": "[1, 1]"
+                                            },
+                                            "Component": {
+                                              "active": true
+                                            },
+                                            "idMaterial": "Material|2022-02-18T09:31:35.421Z|21395"
+                                          }
+                                        }
+                                      ],
+                                      "ComponentTransform": [
+                                        {
+                                          "ƒ.ComponentTransform": {
+                                            "local": {
+                                              "translation": "[0, 0, 0]",
+                                              "rotation": "[0, 0, 0]",
+                                              "scaling": "[1, 1, 1]"
+                                            },
+                                            "Component": {
+                                              "active": true
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    "children": []
                                   }
                                 }
                               ]

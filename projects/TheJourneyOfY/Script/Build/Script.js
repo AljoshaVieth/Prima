@@ -42,43 +42,6 @@ var TheJourneyOfY;
     }
     TheJourneyOfY.CameraMovementScript = CameraMovementScript;
 })(TheJourneyOfY || (TheJourneyOfY = {}));
-var TheYourneyOfY;
-(function (TheYourneyOfY) {
-    var ƒ = FudgeCore;
-    ƒ.Project.registerScriptNamespace(TheYourneyOfY); // Register the namespace to FUDGE for serialization
-    class CustomComponentScript extends ƒ.ComponentScript {
-        // Register the script as component for use in the editor via drag&drop
-        static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
-        // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "CustomComponentScript added to ";
-        constructor() {
-            super();
-            // Don't start when running in editor
-            if (ƒ.Project.mode == ƒ.MODE.EDITOR)
-                return;
-            // Listen to this component being added to or removed from a node
-            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
-        }
-        // Activate the functions of this component as response to events
-        hndEvent = (_event) => {
-            switch (_event.type) {
-                case "componentAdd" /* COMPONENT_ADD */:
-                    ƒ.Debug.log(this.message, this.node);
-                    break;
-                case "componentRemove" /* COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-                    break;
-                case "nodeDeserialized" /* NODE_DESERIALIZED */:
-                    // if deserialized the node is now fully reconstructed and access to all its components and children is possible
-                    break;
-            }
-        };
-    }
-    TheYourneyOfY.CustomComponentScript = CustomComponentScript;
-})(TheYourneyOfY || (TheYourneyOfY = {}));
 var TheJourneyOfY;
 (function (TheJourneyOfY) {
     class DataHandler {
@@ -123,6 +86,7 @@ var TheJourneyOfY;
     let lethalObjects;
     let hoveredObject;
     let controlledObject;
+    let goal;
     let swoshSound;
     let cmpCamera;
     let cameraNode;
@@ -142,11 +106,11 @@ var TheJourneyOfY;
         //graph.addComponent(cmpCamera);
         viewport = new f.Viewport();
         TheJourneyOfY.player = new TheJourneyOfY.Player();
-        let goal = new TheJourneyOfY.GoalObject();
+        //let goal: GoalObject = new GoalObject();
         f.Debug.info("Spawned Player");
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
         viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(TheJourneyOfY.player);
-        viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(goal);
+        //viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(goal);
         FudgeCore.Debug.log("Viewport:", viewport);
         // setup audio
         let cmpListener = new f.ComponentAudioListener();
@@ -187,8 +151,16 @@ var TheJourneyOfY;
         swoshSound = graph.getChildrenByName("Level")[0]
             .getChildrenByName("Sounds")[0]
             .getChildrenByName("swosh")[0];
+        goal = graph.getChildrenByName("Level")[0]
+            .getChildrenByName("Surroundings")[0]
+            .getChildrenByName("Foreground")[0]
+            .getChildrenByName("Non-Movables")[0]
+            .getChildrenByName("Goal")[0];
+        goal.addComponent(new TheJourneyOfY.GoalScript());
         f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
-        graph.addEventListener("PlayerDeathEvent", onPlayerDeath);
+        graph.addEventListener('GameOverEvent', ((event) => {
+            onGameOverHandler(event);
+        }));
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         // spawnPlayer();
         viewport.getCanvas().addEventListener("mousemove", mouseHoverHandler);
@@ -213,8 +185,14 @@ var TheJourneyOfY;
         }
         f.AudioManager.default.update();
     }
-    function onPlayerDeath(_event) {
-        f.Debug.info("!YOU ARE DEAD");
+    function onGameOverHandler(_event) {
+        f.Debug.info("GAMEOVEREVENT TRIGGERED!!!!");
+        if (_event.gameWon) {
+            f.Debug.info("YOU WON!!!!");
+        }
+        else {
+            f.Debug.info("YOU LOST!");
+        }
         f.Loop.stop();
     }
     function mouseHoverHandler(_event) {
@@ -334,12 +312,10 @@ var TheJourneyOfY;
     var f = FudgeCore;
     var ComponentMaterial = FudgeCore.ComponentMaterial;
     class Player extends f.Node {
-        name = "Agent Smith";
         ctrForward;
         rigidbody;
         isOnGround;
         idealPosition;
-        xSpeed;
         constructor() {
             super("Player");
             this.ctrForward = this.ctrForward = new f.Control("Forward", 5, 0 /* PROPORTIONAL */);
@@ -379,14 +355,14 @@ var TheJourneyOfY;
             // Forward
             let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
             this.ctrForward.setInput(forward);
-            f.Debug.info("speed " + this.ctrForward.getOutput());
+            //aaaaaaaada f.Debug.info("speed " + this.ctrForward.getOutput());
             this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
             //console.log(this.ctrForward.getOutput());
             this.isOnGround = false;
             let playerCollisions = this.rigidbody.collisions;
-            f.Debug.info(playerCollisions.length);
+            //f.Debug.info(playerCollisions.length);
             playerCollisions.forEach(collider => {
-                f.Debug.info("Collider: " + collider.node.name);
+                //f.Debug.info("Collider: " + collider.node.name);
                 switch (collider.collisionGroup) {
                     case f.COLLISION_GROUP.GROUP_2: //Ground elements
                         this.isOnGround = true;
@@ -395,10 +371,8 @@ var TheJourneyOfY;
                         this.isOnGround = true;
                         break;
                     case f.COLLISION_GROUP.GROUP_4: //LethalObjects
-                        //TODO die! create event
-                        //alert("YOU ARE DEAD!");
-                        const playerDeathEvent = new Event("PlayerDeathEvent", { "bubbles": true, "cancelable": false });
-                        this.dispatchEvent(playerDeathEvent);
+                        const gameOverEvent = new TheJourneyOfY.GameOverEvent(false);
+                        this.dispatchEvent(gameOverEvent);
                         break;
                     default:
                         break;
@@ -429,37 +403,55 @@ var TheJourneyOfY;
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 var TheJourneyOfY;
 (function (TheJourneyOfY) {
+    class GameOverEvent extends CustomEvent {
+        _gameWon;
+        constructor(gameWon) {
+            super("GameOverEvent", { detail: gameWon, "bubbles": true, "cancelable": false });
+            this._gameWon = gameWon;
+        }
+        get gameWon() {
+            return this._gameWon;
+        }
+    }
+    TheJourneyOfY.GameOverEvent = GameOverEvent;
+})(TheJourneyOfY || (TheJourneyOfY = {}));
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
     var f = FudgeCore;
-    var ComponentMaterial = FudgeCore.ComponentMaterial;
-    class GoalObject extends f.Node {
-        componentTransform;
+    f.Project.registerScriptNamespace(TheJourneyOfY); // Register the namespace to FUDGE for serialization
+    class GoalScript extends f.ComponentScript {
+        // Register the script as component for use in the editor via drag&drop
+        static iSubclass = f.Component.registerSubclass(GoalScript);
+        // Properties may be mutated by users in the editor via the automatically created user interface
+        message = "GoalScript added to ";
         constructor() {
-            super("GoalObject");
-            this.initiatePositionAndScale();
+            super();
+            // Don't start when running in editor
+            if (f.Project.mode == f.MODE.EDITOR)
+                return;
+            // Listen to this component being added to or removed from a node
+            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
+        }
+        // Activate the functions of this component as response to events
+        hndEvent = (_event) => {
+            if (_event.type == "componentAdd" /* COMPONENT_ADD */) {
+                f.Debug.log(this.message, this.node);
+                this.start();
+            }
+        };
+        start() {
             this.initAnim();
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
-        }
-        initiatePositionAndScale() {
-            this.componentTransform = new f.ComponentTransform();
-            this.addComponent(this.componentTransform);
-            this.addComponent(new f.ComponentMesh(new f.MeshSphere("GoalObject")));
-            let textureImage = new f.TextureImage("Textures/goallowpoly.png");
-            let goalMaterial = new f.Material("GoalMaterial", f.ShaderTexture, new f.CoatTextured(new f.Color(1, 1, 1), textureImage));
-            this.addComponent(new ComponentMaterial(goalMaterial));
-            //set position
-            this.mtxLocal.translateZ(0);
-            this.mtxLocal.translateY(0);
-            this.mtxLocal.translateX(5);
-            //set scale
-            this.mtxLocal.scale(f.Vector3.ONE(1));
         }
         update = (_event) => {
             this.checkForPlayerPosition();
         };
         checkForPlayerPosition() {
-            if (this.mtxLocal.translation.getDistance(TheJourneyOfY.player.mtxLocal.translation) < 0.5) {
-                f.Debug.info("GOAL");
-                //TODO fire event
+            if (this.node.mtxLocal.translation.getDistance(TheJourneyOfY.player.mtxLocal.translation) < 0.5) { //Player wins
+                const gameOverEvent = new TheJourneyOfY.GameOverEvent(true);
+                this.node.dispatchEvent(gameOverEvent);
             }
         }
         initAnim() {
@@ -493,14 +485,13 @@ var TheJourneyOfY;
             let animation = new f.Animation("GoalAnimation", animStructure, fps);
             let cmpAnimator = new f.ComponentAnimator(animation, f.ANIMATION_PLAYMODE.LOOP, f.ANIMATION_PLAYBACK.TIMEBASED_CONTINOUS);
             cmpAnimator.scale = 1;
-            if (this.getComponent(f.ComponentAnimator)) {
-                this.removeComponent(this.getComponent(f.ComponentAnimator));
+            if (this.node.getComponent(f.ComponentAnimator)) {
+                this.node.removeComponent(this.node.getComponent(f.ComponentAnimator));
             }
-            this.addComponent(cmpAnimator);
+            this.node.addComponent(cmpAnimator);
             cmpAnimator.activate(true);
-            console.log("Component", cmpAnimator);
         }
     }
-    TheJourneyOfY.GoalObject = GoalObject;
+    TheJourneyOfY.GoalScript = GoalScript;
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 //# sourceMappingURL=Script.js.map

@@ -4,12 +4,11 @@ namespace TheJourneyOfY {
     import Vector3 = FudgeCore.Vector3;
     import Node = FudgeCore.Node;
 
-
     f.Debug.info("Main Program Template running!");
 
     window.addEventListener("load", setup);
     let viewport: f.Viewport;
-    document.addEventListener("interactiveViewportStarted", <EventListener>start);
+    document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
     let canvas: HTMLCanvasElement;
     let graph: f.Node;
     let desiredZoomLevel: number = -70;
@@ -23,6 +22,7 @@ namespace TheJourneyOfY {
     let lethalObjects: f.Node;
     let hoveredObject: f.Node;
     let controlledObject: f.Node;
+    let goal: f.Node;
     let swoshSound: f.Node;
     let cmpCamera: f.ComponentCamera;
     let cameraNode: f.Node;
@@ -41,7 +41,6 @@ namespace TheJourneyOfY {
         graph = <f.Graph>f.Project.resources[graphId];
 
 
-
         // setup the viewport
         cmpCamera = new FudgeCore.ComponentCamera();
         cmpCamera.mtxPivot.rotateY(180);
@@ -49,13 +48,13 @@ namespace TheJourneyOfY {
         //graph.addComponent(cmpCamera);
         viewport = new f.Viewport();
         player = new Player();
-        let goal: GoalObject = new GoalObject();
+        //let goal: GoalObject = new GoalObject();
         f.Debug.info("Spawned Player");
 
 
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
         viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(player);
-        viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(goal);
+        //viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(goal);
         FudgeCore.Debug.log("Viewport:", viewport);
 
         // setup audio
@@ -110,9 +109,20 @@ namespace TheJourneyOfY {
             .getChildrenByName("Sounds")[0]
             .getChildrenByName("swosh")[0];
 
+        goal = graph.getChildrenByName("Level")[0]
+            .getChildrenByName("Surroundings")[0]
+            .getChildrenByName("Foreground")[0]
+            .getChildrenByName("Non-Movables")[0]
+            .getChildrenByName("Goal")[0];
+
+        goal.addComponent(new GoalScript());
+
         f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
 
-        graph.addEventListener("PlayerDeathEvent", onPlayerDeath);
+        graph.addEventListener('GameOverEvent', ((event: GameOverEvent) => {
+            onGameOverHandler(event);
+        }) as EventListener);
+
 
         //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
         // spawnPlayer();
@@ -146,8 +156,14 @@ namespace TheJourneyOfY {
         f.AudioManager.default.update();
     }
 
-    function onPlayerDeath(_event: Event): void{
-        f.Debug.info("!YOU ARE DEAD");
+
+    function onGameOverHandler(_event: GameOverEvent): void {
+        f.Debug.info("GAMEOVEREVENT TRIGGERED!!!!")
+        if (_event.gameWon) {
+            f.Debug.info("YOU WON!!!!")
+        } else {
+            f.Debug.info("YOU LOST!");
+        }
         f.Loop.stop();
     }
 
@@ -253,8 +269,8 @@ namespace TheJourneyOfY {
         playerstats = await dataHandler.parseStats(apiURL);
 
         //TODO move to end
-        playerstats.forEach(function (playerStat){
-            f.Debug.info(playerStat.name  + ": " + playerStat.score);
+        playerstats.forEach(function (playerStat) {
+            f.Debug.info(playerStat.name + ": " + playerStat.score);
         })
     }
 
@@ -278,8 +294,6 @@ namespace TheJourneyOfY {
         });
 
     }
-
-
 
 
 }
