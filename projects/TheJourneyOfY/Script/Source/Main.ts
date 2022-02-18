@@ -309,7 +309,9 @@ namespace TheJourneyOfY {
         scoreTable = <HTMLTableElement>document.getElementById("scoretable");
         _playerStats.forEach(function (playerStat) {
             let row: HTMLTableRowElement = scoreTable.insertRow();
-            row.textContent = playerStat.name + ": " + playerStat.score;
+            let formattedScore = [playerStat.score.toString().slice(0, 2), ",", playerStat.score.toString().slice(2)].join('');
+
+            row.textContent = playerStat.name + ": " + formattedScore;
         })
     }
 

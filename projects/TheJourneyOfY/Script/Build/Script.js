@@ -68,12 +68,9 @@ var TheJourneyOfY;
             console.log("Submitting score: name=" + name + " score=" + score + " url=" + apiUrl + "?mode=insert");
             let formData = new FormData();
             formData.append('name', name);
-            formData.append('score', score.toString());
-            await fetch(apiUrl + "?mode=insert", {
-                method: 'POST',
-                body: formData,
-                headers: { 'Content-Type': 'application/form-data; charset=UTF-8' }
-            });
+            formData.append('score', score.toFixed(2));
+            let query = new URLSearchParams(formData);
+            await fetch(apiUrl + "?mode=insert&" + query);
         }
     }
     TheJourneyOfY.DataHandler = DataHandler;
@@ -425,7 +422,8 @@ var TheJourneyOfY;
         scoreTable = document.getElementById("scoretable");
         _playerStats.forEach(function (playerStat) {
             let row = scoreTable.insertRow();
-            row.textContent = playerStat.name + ": " + playerStat.score;
+            let formattedScore = [playerStat.score.toString().slice(0, 2), ",", playerStat.score.toString().slice(2)].join('');
+            row.textContent = playerStat.name + ": " + formattedScore;
         });
     }
     TheJourneyOfY.populateScoreTable = populateScoreTable;

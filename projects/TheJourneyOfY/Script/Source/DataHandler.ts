@@ -28,18 +28,13 @@ namespace TheJourneyOfY {
             return playerStats;
         }
 
-        async submitScore(apiUrl: string, score: number, name: string){
-            console.log("Submitting score: name=" + name + " score=" + score + " url=" + apiUrl+ "?mode=insert")
+        async submitScore(apiUrl: string, score: number, name: string) {
+            console.log("Submitting score: name=" + name + " score=" + score + " url=" + apiUrl + "?mode=insert")
             let formData: FormData = new FormData();
             formData.append('name', name);
-            formData.append('score', score.toString());
-
-            await fetch(apiUrl + "?mode=insert", {
-                method: 'POST',
-                body: formData,
-                headers: {'Content-Type': 'application/form-data; charset=UTF-8'} });
+            formData.append('score', score.toFixed(2));
+            let query: URLSearchParams = new URLSearchParams(<any>formData);
+            await fetch(apiUrl + "?mode=insert&" + query);
         }
-
-
     }
 }
