@@ -325,7 +325,11 @@ namespace TheJourneyOfY {
         dataHandler = new DataHandler();
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
-        playMusic = config.music;
+        if (config.music == "true") {
+            playMusic = true;
+        } else {
+            playMusic = false;
+        }
         f.Debug.info("playmusic: " + playMusic);
         f.Debug.info("apiURL: " + apiURL);
 

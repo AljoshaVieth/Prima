@@ -437,6 +437,7 @@ var TheJourneyOfY;
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
         playMusic = config.music;
+        f.Debug.info(config.music);
         f.Debug.info("playmusic: " + playMusic);
         f.Debug.info("apiURL: " + apiURL);
         playerstats = await dataHandler.parseStats(apiURL);
