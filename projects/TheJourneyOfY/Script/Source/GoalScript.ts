@@ -49,9 +49,9 @@ namespace TheJourneyOfY {
 
     private initAnim(): void {
       let hoveringAnimSeq: f.AnimationSequence = new f.AnimationSequence();
-      hoveringAnimSeq.addKey(new f.AnimationKey(0, -1));
-      hoveringAnimSeq.addKey(new f.AnimationKey(3000, 1));
-      hoveringAnimSeq.addKey(new f.AnimationKey(6000, -1));
+      hoveringAnimSeq.addKey(new f.AnimationKey(0, 2));
+      hoveringAnimSeq.addKey(new f.AnimationKey(3000, 4));
+      hoveringAnimSeq.addKey(new f.AnimationKey(6000, 2));
 
       let rotatingAnimSeq: f.AnimationSequence = new f.AnimationSequence();
       rotatingAnimSeq.addKey(new f.AnimationKey(0, 0));
