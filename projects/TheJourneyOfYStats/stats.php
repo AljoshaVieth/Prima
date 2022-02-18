@@ -1,16 +1,18 @@
 <?php
 header('Access-Control-Allow-Origin: *');
+
 header('Access-Control-Allow-Methods: GET, POST');
+
 header("Access-Control-Allow-Headers: X-Requested-With");
 
 if (isset($_GET['mode']) && !empty($_GET['mode'])) {
     $mode = $_GET["mode"];
-    $pdo = new PDO('mysql:host=localhost;dbname=prima', 'user', 'pw');
+    $pdo = new PDO('mysql:host=localhost;dbname=prima', 'user', 'secret');
     $status = $pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS);
     if ($mode == "insert") {
-        if (isset($_POST['name']) && !empty($_POST['name']) && isset($_POST['score']) && !empty($_POST['score'])) {
-            $name = strip_tags($_POST["name"]);
-            $score = strip_tags($_POST["score"]);
+        if (isset($_GET['name']) && !empty($_GET['name']) && isset($_GET['score']) && !empty($_GET['score'])) {
+            $name = strip_tags($_GET["name"]);
+            $score = strip_tags($_GET["score"]);
             $name = preg_replace("/[^A-Za-z0-9 ]/", '', $name);
             $score = preg_replace("/[^0-9 ]/", '', $score);
             if (is_numeric($score)) {
@@ -23,7 +25,7 @@ if (isset($_GET['mode']) && !empty($_GET['mode'])) {
             echo "No name or score provided!";
         }
     } else if ($mode == "get") {
-        $selectstatement = "SELECT name, score FROM stats";
+        $selectstatement = "SELECT name, score FROM stats ORDER BY score ASC LIMIT 10";
         $statsarray = array();
         foreach ($pdo->query($selectstatement) as $row) {
             $myObj = new stdClass;
@@ -39,4 +41,5 @@ if (isset($_GET['mode']) && !empty($_GET['mode'])) {
     //default landing page
     echo "false arguments...";
 }
+
 ?>
