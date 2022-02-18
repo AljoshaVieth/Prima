@@ -10,7 +10,7 @@ For credits etc. please see [here](https://github.com/AljoshaVieth/Prima/tree/ma
 - Curriculum and semester: MIB 7
 - Course this development was created in (PRIMA): PRIMA
 - Docent: Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl
-- Link to the finished and executable application on Github-Pages: https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/index.html
+- Link to the finished and executable application on Github-Pages: https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/index.html (sometimes loads slow)
 - Link to the source code: https://github.com/AljoshaVieth/Prima/tree/main/projects/TheJourneyOfY + https://github.com/AljoshaVieth/Prima/tree/main/projects/TheJourneyOfYStats
 - Link to the design document: https://github.com/AljoshaVieth/Prima/blob/main/TheYourneyOfY.pdf
 - Description for users on how to interact: Move right and left with arrow-keys or A and D. Jump with space. Drag objects per mouse (hover->click->drag->drop). Goal is to hit the floating sphere at the far right handside with your player.
