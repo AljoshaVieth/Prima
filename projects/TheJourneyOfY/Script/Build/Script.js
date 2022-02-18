@@ -315,7 +315,9 @@ var TheJourneyOfY;
         viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         initializeCollisionGroups();
-        music.getComponents(f.ComponentAudio)[0].play(true);
+        if (playMusic) {
+            music.getComponents(f.ComponentAudio)[0].play(true);
+        }
         gameStarted = true;
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -350,9 +352,7 @@ var TheJourneyOfY;
         }
     }
     function stopGame() {
-        if (playMusic) {
-            music.getComponents(f.ComponentAudio)[0].play(false);
-        }
+        music.getComponents(f.ComponentAudio)[0].play(false);
         swoshSound.getComponents(f.ComponentAudio)[0].play(false);
         TheJourneyOfY.jumpSound.getComponents(f.ComponentAudio)[0].play(false);
         gameOverScreen.style.visibility = "visible";
@@ -436,8 +436,12 @@ var TheJourneyOfY;
         dataHandler = new TheJourneyOfY.DataHandler();
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
-        playMusic = config.music;
-        f.Debug.info(config.music);
+        if (config.music == "true") {
+            playMusic = true;
+        }
+        else {
+            playMusic = false;
+        }
         f.Debug.info("playmusic: " + playMusic);
         f.Debug.info("apiURL: " + apiURL);
         playerstats = await dataHandler.parseStats(apiURL);

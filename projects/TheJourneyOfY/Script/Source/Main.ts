@@ -189,7 +189,9 @@ namespace TheJourneyOfY {
 
         f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         initializeCollisionGroups();
-        music.getComponents(f.ComponentAudio)[0].play(true);
+        if (playMusic) {
+            music.getComponents(f.ComponentAudio)[0].play(true);
+        }
         gameStarted = true;
         f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -228,9 +230,9 @@ namespace TheJourneyOfY {
     }
 
     function stopGame() {
-        if (playMusic) {
-            music.getComponents(f.ComponentAudio)[0].play(false);
-        }
+
+        music.getComponents(f.ComponentAudio)[0].play(false);
+
         swoshSound.getComponents(f.ComponentAudio)[0].play(false);
         jumpSound.getComponents(f.ComponentAudio)[0].play(false);
         gameOverScreen.style.visibility = "visible";

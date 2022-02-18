@@ -18,7 +18,6 @@ namespace TheJourneyOfY {
         }
 
         async parseStats(apiUrl: string) {
-            console.log("parsing stats");
             let stats = await this.loadJson(apiUrl + "?mode=get");
             let playerStats: PlayerStat[] = [];
             for (let i = 0; i < stats.length; i++) {
