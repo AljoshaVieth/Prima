@@ -50,6 +50,7 @@ namespace TheJourneyOfY {
     let gameOverText: HTMLElement;
     let playerName: HTMLInputElement;
 
+    let playMusic: boolean = true;
 
 
     async function start(_event: CustomEvent): Promise<void> {
@@ -108,7 +109,7 @@ namespace TheJourneyOfY {
             window.location.reload();
         });
 
-        submitScoreButton.addEventListener("click", function (){
+        submitScoreButton.addEventListener("click", function () {
             dataHandler.submitScore(apiURL, timePassed, playerName.value);
         });
         console.log("Starting...");
@@ -227,7 +228,9 @@ namespace TheJourneyOfY {
     }
 
     function stopGame() {
-        music.getComponents(f.ComponentAudio)[0].play(false);
+        if (playMusic) {
+            music.getComponents(f.ComponentAudio)[0].play(false);
+        }
         swoshSound.getComponents(f.ComponentAudio)[0].play(false);
         jumpSound.getComponents(f.ComponentAudio)[0].play(false);
         gameOverScreen.style.visibility = "visible";
@@ -322,9 +325,11 @@ namespace TheJourneyOfY {
         dataHandler = new DataHandler();
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
+        playMusic = config.music;
+        f.Debug.info("playmusic: " + playMusic);
         f.Debug.info("apiURL: " + apiURL);
 
-       playerstats = await dataHandler.parseStats(apiURL);
+        playerstats = await dataHandler.parseStats(apiURL);
 
     }
 

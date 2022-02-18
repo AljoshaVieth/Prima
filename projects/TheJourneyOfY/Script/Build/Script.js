@@ -212,6 +212,7 @@ var TheJourneyOfY;
     let submitScoreButton;
     let gameOverText;
     let playerName;
+    let playMusic = true;
     async function start(_event) {
         startTime = new Date().getTime();
         console.log("setting up...");
@@ -349,7 +350,9 @@ var TheJourneyOfY;
         }
     }
     function stopGame() {
-        music.getComponents(f.ComponentAudio)[0].play(false);
+        if (playMusic) {
+            music.getComponents(f.ComponentAudio)[0].play(false);
+        }
         swoshSound.getComponents(f.ComponentAudio)[0].play(false);
         TheJourneyOfY.jumpSound.getComponents(f.ComponentAudio)[0].play(false);
         gameOverScreen.style.visibility = "visible";
@@ -433,6 +436,8 @@ var TheJourneyOfY;
         dataHandler = new TheJourneyOfY.DataHandler();
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
+        playMusic = config.music;
+        f.Debug.info("playmusic: " + playMusic);
         f.Debug.info("apiURL: " + apiURL);
         playerstats = await dataHandler.parseStats(apiURL);
     }
