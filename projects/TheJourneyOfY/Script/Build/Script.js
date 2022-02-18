@@ -67,117 +67,94 @@ var TheJourneyOfY;
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 var TheJourneyOfY;
 (function (TheJourneyOfY) {
-    // import * as configJson from "../../config.json"; // This import style requires "esModuleInterop" (tsconfig: "resolveJsonModule": true, "esModuleInterop": true) TypeScript 2.9+
     var f = FudgeCore;
-    var Vector3 = FudgeCore.Vector3;
     f.Debug.info("Main Program Template running!");
     window.addEventListener("load", setup);
-    let viewport;
     document.addEventListener("interactiveViewportStarted", start);
+    TheJourneyOfY.activatePhysics = true;
     let canvas;
-    let graph;
     let desiredZoomLevel = -70;
     let currentZoomLevel = -80;
     let graphId = "Graph|2022-01-08T12:51:22.101Z|15244";
-    let objectSelected = false;
-    let hoveringOverControllableObject = false;
-    let controllableObjects;
     let groundObjects;
     let lethalObjects;
-    let hoveredObject;
-    let controlledObject;
     let goal;
-    let swoshSound;
     let cmpCamera;
     let cameraNode;
     let apiURL;
     let dataHandler;
+    let mouseObserver;
     let playerstats;
-    let activatePhysics = true;
-    let body;
     async function start(_event) {
         console.log("setting up...");
         await FudgeCore.Project.loadResourcesFromHTML();
-        graph = f.Project.resources[graphId];
+        TheJourneyOfY.graph = f.Project.resources[graphId];
         // setup the viewport
         cmpCamera = new FudgeCore.ComponentCamera();
         cmpCamera.mtxPivot.rotateY(180);
         cmpCamera.mtxPivot.translateZ(-30);
-        //graph.addComponent(cmpCamera);
-        viewport = new f.Viewport();
+        TheJourneyOfY.viewport = new f.Viewport();
         TheJourneyOfY.player = new TheJourneyOfY.Player();
-        //let goal: GoalObject = new GoalObject();
-        f.Debug.info("Spawned Player");
-        viewport.initialize("Viewport", graph, cmpCamera, canvas);
-        viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(TheJourneyOfY.player);
-        //viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(goal);
-        FudgeCore.Debug.log("Viewport:", viewport);
+        TheJourneyOfY.viewport.initialize("Viewport", TheJourneyOfY.graph, cmpCamera, canvas);
+        TheJourneyOfY.viewport.getBranch().getChildrenByName("Level")[0].getChildrenByName("Characters")[0].getChildrenByName("Player")[0].addChild(TheJourneyOfY.player);
+        FudgeCore.Debug.log("Viewport:", TheJourneyOfY.viewport);
         // setup audio
         let cmpListener = new f.ComponentAudioListener();
-        //cmpCamera.node.addComponent(cmpListener);
-        //cmpCamera.node.addComponent(new CameraScript());
         cameraNode = new f.Node("cameraNode");
         cameraNode.addComponent(cmpCamera);
         cameraNode.addComponent(new f.ComponentTransform);
         cameraNode.addComponent(new TheJourneyOfY.CameraMovementScript());
-        //cameraNode.addComponent(cmpListener);
-        graph.addChild(cameraNode);
+        TheJourneyOfY.graph.addChild(cameraNode);
         FudgeCore.AudioManager.default.listenWith(cmpListener);
-        FudgeCore.AudioManager.default.listenTo(graph);
+        FudgeCore.AudioManager.default.listenTo(TheJourneyOfY.graph);
         FudgeCore.Debug.log("Audio:", FudgeCore.AudioManager.default);
         // draw viewport once for immediate feedback
-        //viewport.draw();
-        body = document.getElementsByTagName('body')[0];
-        console.log("Starting...");
-        //viewport = _event.detail;
-        //graph = viewport.getBranch();
-        console.log(viewport);
-        console.log(graph);
-        controllableObjects = graph.getChildrenByName("Level")[0]
+        TheJourneyOfY.viewport.draw();
+        TheJourneyOfY.body = document.getElementsByTagName('body')[0];
+        TheJourneyOfY.controllableObjects = TheJourneyOfY.graph.getChildrenByName("Level")[0]
             .getChildrenByName("Surroundings")[0]
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Movables")[0]
             .getChildrenByName("Controllables")[0];
-        groundObjects = graph.getChildrenByName("Level")[0]
+        groundObjects = TheJourneyOfY.graph.getChildrenByName("Level")[0]
             .getChildrenByName("Surroundings")[0]
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Non-Movables")[0]
             .getChildrenByName("Ground")[0];
-        lethalObjects = graph.getChildrenByName("Level")[0]
+        lethalObjects = TheJourneyOfY.graph.getChildrenByName("Level")[0]
             .getChildrenByName("Surroundings")[0]
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Non-Movables")[0]
             .getChildrenByName("LethalObjects")[0];
-        swoshSound = graph.getChildrenByName("Level")[0]
+        TheJourneyOfY.swoshSound = TheJourneyOfY.graph.getChildrenByName("Level")[0]
             .getChildrenByName("Sounds")[0]
             .getChildrenByName("swosh")[0];
-        goal = graph.getChildrenByName("Level")[0]
+        goal = TheJourneyOfY.graph.getChildrenByName("Level")[0]
             .getChildrenByName("Surroundings")[0]
             .getChildrenByName("Foreground")[0]
             .getChildrenByName("Non-Movables")[0]
             .getChildrenByName("Goal")[0];
         goal.addComponent(new TheJourneyOfY.GoalScript());
-        f.Debug.info("Number of controllable Objects: " + controllableObjects.getChildren().length);
-        graph.addEventListener('GameOverEvent', ((event) => {
+        f.Debug.info("Number of controllable Objects: " + TheJourneyOfY.controllableObjects.getChildren().length);
+        TheJourneyOfY.graph.addEventListener('GameOverEvent', ((event) => {
             onGameOverHandler(event);
         }));
-        //graph.getComponents(ƒ.ComponentAudio)[1].play(true);
-        // spawnPlayer();
-        viewport.getCanvas().addEventListener("mousemove", mouseHoverHandler);
-        viewport.getCanvas().addEventListener("mousedown", mouseDownHandler);
-        viewport.getCanvas().addEventListener("mousemove", mouseMoveHandler);
-        viewport.getCanvas().addEventListener("mouseup", mouseUpHandler);
-        viewport.getCanvas().addEventListener("wheel", scrollHandler);
-        viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
+        mouseObserver = new TheJourneyOfY.MouseObserver();
+        TheJourneyOfY.viewport.getCanvas().addEventListener("mousemove", mouseObserver.mouseHoverHandler);
+        TheJourneyOfY.viewport.getCanvas().addEventListener("mousedown", mouseObserver.mouseDownHandler);
+        TheJourneyOfY.viewport.getCanvas().addEventListener("mousemove", mouseObserver.mouseMoveHandler);
+        TheJourneyOfY.viewport.getCanvas().addEventListener("mouseup", mouseObserver.mouseUpHandler);
+        TheJourneyOfY.viewport.getCanvas().addEventListener("wheel", mouseObserver.scrollHandler);
+        TheJourneyOfY.viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         initializeCollisionGroups();
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        if (activatePhysics && currentZoomLevel == desiredZoomLevel) {
+        if (TheJourneyOfY.activatePhysics && currentZoomLevel == desiredZoomLevel) {
             f.Physics.world.simulate(); // if physics is included and used
         }
-        viewport.draw();
+        TheJourneyOfY.viewport.draw();
         //zoom in
         if (currentZoomLevel < desiredZoomLevel) {
             currentZoomLevel++;
@@ -186,7 +163,6 @@ var TheJourneyOfY;
         f.AudioManager.default.update();
     }
     function onGameOverHandler(_event) {
-        f.Debug.info("GAMEOVEREVENT TRIGGERED!!!!");
         if (_event.gameWon) {
             f.Debug.info("YOU WON!!!!");
         }
@@ -195,91 +171,9 @@ var TheJourneyOfY;
         }
         f.Loop.stop();
     }
-    function mouseHoverHandler(_event) {
-        let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
-        if (!objectSelected) {
-            //f.Debug.info("No object selected");
-            for (let controllableObject of controllableObjects.getIterator()) {
-                if (controllableObject.name == "Controllables") {
-                    continue; //ignoring parent object since it cannot be moved and causes problems otherwise
-                }
-                let componentMesh = controllableObject.getComponent(f.ComponentMesh);
-                let position = componentMesh ? componentMesh.mtxWorld.translation : controllableObject.mtxWorld.translation;
-                if (ray.getDistance(position).magnitude < controllableObject.radius) {
-                    f.Debug.info("hovering over controllable object named: " + controllableObject.name);
-                    hoveringOverControllableObject = true;
-                    hoveredObject = controllableObject;
-                    break; //ignoring other controllable objects. There can only be one.
-                }
-                else {
-                    hoveringOverControllableObject = false;
-                }
-            }
-        }
-        else {
-            /*
-            for (let borderObject of borderObjects.getIterator()) {
-                if (borderObject.name == "MovementBorder") {
-                    continue; //ignoring parent object since it is not relevant and causes problems otherwise
-                }
-                let componentMesh: f.ComponentMesh = borderObject.getComponent(f.ComponentMesh);
-                let position: f.Vector3 = componentMesh ? componentMesh.mtxWorld.translation : borderObject.mtxWorld.translation;
-                if (ray.getDistance(position).magnitude < borderObject.radius) {
-                    f.Debug.info("Hovering over " + borderObject.name + "! releasing object...");
-                    releaseObject();
-                    break; //ignoring other controllable objects. There can only be one.
-                }
-            }
-
-             */
-        }
-    }
-    function mouseDownHandler(_event) {
-        if (hoveringOverControllableObject) {
-            swoshSound.getComponents(f.ComponentAudio)[0].play(true);
-            activatePhysics = false;
-            body.classList.add("grayscale"); //add the class
-            objectSelected = true;
-            controlledObject = hoveredObject;
-            /*
-            // not needed anymore cause physics gets disabled completely
-            controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 0;
-            //stopping rotation
-            controlledObject.getComponent(f.ComponentRigidbody).effectRotation = new f.Vector3(0, 0, 0);
-             */
-        }
-    }
-    function mouseUpHandler(_event) {
-        if (objectSelected) {
-            releaseObject();
-        }
-    }
-    function mouseMoveHandler(_event) {
-        if (objectSelected) {
-            let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
-            let mousePositionOnWorld = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
-            let moveVector = f.Vector3.DIFFERENCE(mousePositionOnWorld, controlledObject.mtxLocal.translation);
-            controlledObject.getComponent(f.ComponentRigidbody).translateBody(moveVector);
-        }
-    }
-    function scrollHandler(_event) {
-        if (objectSelected) {
-            controlledObject.getComponent(f.ComponentRigidbody).rotateBody(new Vector3(0, 0, _event.deltaY));
-        }
-    }
-    function releaseObject() {
-        activatePhysics = true;
-        body.classList.remove("grayscale"); //remove the class
-        controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 1;
-        controlledObject.getComponent(f.ComponentRigidbody).effectRotation = new f.Vector3(0, 0, 1);
-        //controlledObject.getComponent(f.ComponentRigidbody).translateBody(currentPosition);
-        objectSelected = false;
-        hoveredObject = null;
-        controlledObject = null;
-    }
     async function setup() {
         canvas = document.querySelector("canvas");
-        canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
+        canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: TheJourneyOfY.viewport }));
         dataHandler = new TheJourneyOfY.DataHandler();
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
@@ -298,12 +192,8 @@ var TheJourneyOfY;
         lethalObjects.getChildren().forEach(function (lethalObject) {
             lethalObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_4;
         });
-        controllableObjects.getChildren().forEach(function (controllableObject) {
+        TheJourneyOfY.controllableObjects.getChildren().forEach(function (controllableObject) {
             controllableObject.getComponent(f.ComponentRigidbody).collisionGroup = f.COLLISION_GROUP.GROUP_3;
-        });
-        controllableObjects.getChildren().forEach(function (controllableObject) {
-            f.Debug.info("Collisiongroup: ");
-            f.Debug.info(controllableObject.getComponent(f.ComponentRigidbody).collisionGroup);
         });
     }
 })(TheJourneyOfY || (TheJourneyOfY = {}));
@@ -355,12 +245,9 @@ var TheJourneyOfY;
             // Forward
             let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
             this.ctrForward.setInput(forward);
-            //aaaaaaaada f.Debug.info("speed " + this.ctrForward.getOutput());
             this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
-            //console.log(this.ctrForward.getOutput());
             this.isOnGround = false;
             let playerCollisions = this.rigidbody.collisions;
-            //f.Debug.info(playerCollisions.length);
             playerCollisions.forEach(collider => {
                 //f.Debug.info("Collider: " + collider.node.name);
                 switch (collider.collisionGroup) {
@@ -493,5 +380,97 @@ var TheJourneyOfY;
         }
     }
     TheJourneyOfY.GoalScript = GoalScript;
+})(TheJourneyOfY || (TheJourneyOfY = {}));
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
+    var f = FudgeCore;
+    var Vector3 = FudgeCore.Vector3;
+    TheJourneyOfY.objectSelected = false;
+    TheJourneyOfY.hoveringOverControllableObject = false;
+    class MouseObserver {
+        mouseHoverHandler(_event) {
+            let ray = TheJourneyOfY.viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
+            if (!TheJourneyOfY.objectSelected) {
+                //f.Debug.info("No object selected");
+                for (let controllableObject of TheJourneyOfY.controllableObjects.getIterator()) {
+                    if (controllableObject.name == "Controllables") {
+                        continue; //ignoring parent object since it cannot be moved and causes problems otherwise
+                    }
+                    let componentMesh = controllableObject.getComponent(f.ComponentMesh);
+                    let position = componentMesh ? componentMesh.mtxWorld.translation : controllableObject.mtxWorld.translation;
+                    if (ray.getDistance(position).magnitude < controllableObject.radius) {
+                        f.Debug.info("hovering over controllable object named: " + controllableObject.name);
+                        TheJourneyOfY.hoveringOverControllableObject = true;
+                        TheJourneyOfY.hoveredObject = controllableObject;
+                        break; //ignoring other controllable objects. There can only be one.
+                    }
+                    else {
+                        TheJourneyOfY.hoveringOverControllableObject = false;
+                    }
+                }
+            }
+            else {
+                /*
+                for (let borderObject of borderObjects.getIterator()) {
+                    if (borderObject.name == "MovementBorder") {
+                        continue; //ignoring parent object since it is not relevant and causes problems otherwise
+                    }
+                    let componentMesh: f.ComponentMesh = borderObject.getComponent(f.ComponentMesh);
+                    let position: f.Vector3 = componentMesh ? componentMesh.mtxWorld.translation : borderObject.mtxWorld.translation;
+                    if (ray.getDistance(position).magnitude < borderObject.radius) {
+                        f.Debug.info("Hovering over " + borderObject.name + "! releasing object...");
+                        releaseObject();
+                        break; //ignoring other controllable objects. There can only be one.
+                    }
+                }
+
+                 */
+            }
+        }
+        mouseDownHandler(_event) {
+            if (TheJourneyOfY.hoveringOverControllableObject) {
+                TheJourneyOfY.swoshSound.getComponents(f.ComponentAudio)[0].play(true);
+                TheJourneyOfY.activatePhysics = false;
+                TheJourneyOfY.body.classList.add("grayscale"); //add the class
+                TheJourneyOfY.objectSelected = true;
+                TheJourneyOfY.controlledObject = TheJourneyOfY.hoveredObject;
+                /*
+                // not needed anymore cause physics gets disabled completely
+                controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 0;
+                //stopping rotation
+                controlledObject.getComponent(f.ComponentRigidbody).effectRotation = new f.Vector3(0, 0, 0);
+                 */
+            }
+        }
+        mouseUpHandler(_event) {
+            if (TheJourneyOfY.objectSelected) {
+                releaseObject();
+            }
+        }
+        mouseMoveHandler(_event) {
+            if (TheJourneyOfY.objectSelected) {
+                let ray = TheJourneyOfY.viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
+                let mousePositionOnWorld = ray.intersectPlane(new f.Vector3(0, 0, 0), new f.Vector3(0, 0, 1)); // check
+                let moveVector = f.Vector3.DIFFERENCE(mousePositionOnWorld, TheJourneyOfY.controlledObject.mtxLocal.translation);
+                TheJourneyOfY.controlledObject.getComponent(f.ComponentRigidbody).translateBody(moveVector);
+            }
+        }
+        scrollHandler(_event) {
+            if (TheJourneyOfY.objectSelected) {
+                TheJourneyOfY.controlledObject.getComponent(f.ComponentRigidbody).rotateBody(new Vector3(0, 0, _event.deltaY));
+            }
+        }
+    }
+    TheJourneyOfY.MouseObserver = MouseObserver;
+    function releaseObject() {
+        TheJourneyOfY.activatePhysics = true;
+        TheJourneyOfY.body.classList.remove("grayscale"); //remove the class
+        TheJourneyOfY.controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 1;
+        TheJourneyOfY.controlledObject.getComponent(f.ComponentRigidbody).effectRotation = new f.Vector3(0, 0, 1);
+        //controlledObject.getComponent(f.ComponentRigidbody).translateBody(currentPosition);
+        TheJourneyOfY.objectSelected = false;
+        TheJourneyOfY.hoveredObject = null;
+        TheJourneyOfY.controlledObject = null;
+    }
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 //# sourceMappingURL=Script.js.map

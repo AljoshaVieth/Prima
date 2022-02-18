@@ -55,12 +55,9 @@ namespace TheJourneyOfY {
             // Forward
             let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT], [f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT]);
             this.ctrForward.setInput(forward);
-           //aaaaaaaada f.Debug.info("speed " + this.ctrForward.getOutput());
             this.rigidbody.applyForce(f.Vector3.SCALE(this.mtxLocal.getX(), this.ctrForward.getOutput()));
-            //console.log(this.ctrForward.getOutput());
             this.isOnGround = false;
             let playerCollisions: f.ComponentRigidbody[] = this.rigidbody.collisions;
-            //f.Debug.info(playerCollisions.length);
 
 
 
