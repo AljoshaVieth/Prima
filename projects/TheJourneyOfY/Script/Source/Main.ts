@@ -28,6 +28,9 @@ namespace TheJourneyOfY {
     let apiURL: string;
     let dataHandler: DataHandler;
     let playerstats: PlayerStat[];
+    let gameStarted: boolean;
+    let startTime: number;
+    let timePassed: number;
 
     let swoshSound: f.Node;
     export let jumpSound: f.Node;
@@ -36,12 +39,21 @@ namespace TheJourneyOfY {
     let music: f.Node;
 
 
-
     let activatePhysics: boolean = true;
     let body: HTMLBodyElement;
+    let reloadButton: HTMLElement;
+    let gameOverScreen: HTMLElement;
+    let scoreTable: HTMLTableElement;
+    let yourScoreText: HTMLElement;
+    let submitScoreScreen: HTMLElement;
+    let submitScoreButton: HTMLElement;
+    let gameOverText: HTMLElement;
+    let playerName: HTMLInputElement;
+
 
 
     async function start(_event: CustomEvent): Promise<void> {
+        startTime = new Date().getTime();
         console.log("setting up...");
         await FudgeCore.Project.loadResourcesFromHTML();
         graph = <f.Graph>f.Project.resources[graphId];
@@ -83,7 +95,22 @@ namespace TheJourneyOfY {
         //viewport.draw();
 
         body = document.getElementsByTagName('body')[0];
+        gameOverScreen = document.getElementById('GameOver');
+        reloadButton = document.getElementById("reload");
+        submitScoreButton = document.getElementById("submitscoreButton");
+        yourScoreText = document.getElementById("yourscore");
+        submitScoreScreen = document.getElementById("SubmitScore");
+        gameOverText = document.getElementById("GameOverText");
+        playerName = <HTMLInputElement>document.getElementById("playername");
 
+
+        reloadButton.addEventListener("click", function () {
+            window.location.reload();
+        });
+
+        submitScoreButton.addEventListener("click", function (){
+            dataHandler.submitScore(apiURL, timePassed, playerName.value);
+        });
         console.log("Starting...");
         //viewport = _event.detail;
 
@@ -132,7 +159,6 @@ namespace TheJourneyOfY {
             .getChildrenByName("music")[0];
 
 
-
         goal = graph.getChildrenByName("Level")[0]
             .getChildrenByName("Surroundings")[0]
             .getChildrenByName("Foreground")[0]
@@ -163,39 +189,54 @@ namespace TheJourneyOfY {
         f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         initializeCollisionGroups();
         music.getComponents(f.ComponentAudio)[0].play(true);
+        gameStarted = true;
         f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
 
     function update(_event: Event): void {
-        if (activatePhysics && currentZoomLevel == desiredZoomLevel) {
-            f.Physics.world.simulate();  // if physics is included and used
+        if (gameStarted) {
+            if (activatePhysics && currentZoomLevel == desiredZoomLevel) {
+                f.Physics.world.simulate();  // if physics is included and used
+            }
+            viewport.draw();
+            //zoom in
+            if (currentZoomLevel < desiredZoomLevel) {
+                currentZoomLevel++;
+                cmpCamera.mtxPivot.translateZ(1);
+            }
+            timePassed = (new Date().getTime() - startTime) / 1000;
+            GameState.get().time = timePassed;
+            f.AudioManager.default.update();
         }
-        viewport.draw();
-
-        //zoom in
-        if (currentZoomLevel < desiredZoomLevel) {
-            currentZoomLevel++;
-            cmpCamera.mtxPivot.translateZ(1);
-        }
-
-        f.AudioManager.default.update();
-        //victorySound.getComponents(f.ComponentAudio)[0].play(true);
-
 
     }
 
 
     function onGameOverHandler(_event: GameOverEvent): void {
-        f.Debug.info("GAMEOVEREVENT TRIGGERED!!!!")
-        if (_event.gameWon) {
-            f.Debug.info("YOU WON!!!!")
-            victorySound.getComponents(f.ComponentAudio)[0].play(true);
-        } else {
-            f.Debug.info("YOU LOST!");
-            defeatSound.getComponents(f.ComponentAudio)[0].play(true);
-
+        if (gameStarted) {
+            if (_event.gameWon) {
+                victorySound.getComponents(f.ComponentAudio)[0].play(true);
+                submitScoreScreen.style.visibility = "visible";
+                yourScoreText.style.visibility = "visible";
+                gameOverText.textContent = "WELL DONE"
+            } else {
+                defeatSound.getComponents(f.ComponentAudio)[0].play(true);
+            }
+            stopGame();
         }
+    }
+
+    function stopGame() {
+        music.getComponents(f.ComponentAudio)[0].play(false);
+        swoshSound.getComponents(f.ComponentAudio)[0].play(false);
+        jumpSound.getComponents(f.ComponentAudio)[0].play(false);
+        gameOverScreen.style.visibility = "visible";
+        yourScoreText.textContent = "Your time: " + timePassed;
+
+        f.Debug.info("stopped");
+        gameStarted = false;
         f.Loop.stop();
+        f.Loop.removeEventListener(f.EVENT.LOOP_FRAME, update);
     }
 
     function mouseHoverHandler(_event: MouseEvent): void {
@@ -217,22 +258,6 @@ namespace TheJourneyOfY {
                     hoveringOverControllableObject = false;
                 }
             }
-        } else {
-            /*
-            for (let borderObject of borderObjects.getIterator()) {
-                if (borderObject.name == "MovementBorder") {
-                    continue; //ignoring parent object since it is not relevant and causes problems otherwise
-                }
-                let componentMesh: f.ComponentMesh = borderObject.getComponent(f.ComponentMesh);
-                let position: f.Vector3 = componentMesh ? componentMesh.mtxWorld.translation : borderObject.mtxWorld.translation;
-                if (ray.getDistance(position).magnitude < borderObject.radius) {
-                    f.Debug.info("Hovering over " + borderObject.name + "! releasing object...");
-                    releaseObject();
-                    break; //ignoring other controllable objects. There can only be one.
-                }
-            }
-
-             */
         }
 
     }
@@ -245,13 +270,6 @@ namespace TheJourneyOfY {
             body.classList.add("grayscale");   //add the class
             objectSelected = true;
             controlledObject = hoveredObject;
-
-            /*
-            // not needed anymore cause physics gets disabled completely
-            controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 0;
-            //stopping rotation
-            controlledObject.getComponent(f.ComponentRigidbody).effectRotation = new f.Vector3(0, 0, 0);
-             */
         }
     }
 
@@ -287,23 +305,27 @@ namespace TheJourneyOfY {
         controlledObject = null;
     }
 
+    export function populateScoreTable(_playerStats: PlayerStat[]): void {
+        scoreTable = <HTMLTableElement>document.getElementById("scoretable");
+        _playerStats.forEach(function (playerStat) {
+            let row: HTMLTableRowElement = scoreTable.insertRow();
+            row.textContent = playerStat.name + ": " + playerStat.score;
+        })
+    }
 
     async function setup(): Promise<void> {
         canvas = document.querySelector("canvas");
-        canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
+        canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", {bubbles: true, detail: viewport}));
 
         dataHandler = new DataHandler();
         let config = await dataHandler.loadJson("https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/config.json");
         apiURL = config.apiURL;
         f.Debug.info("apiURL: " + apiURL);
 
-        playerstats = await dataHandler.parseStats(apiURL);
+       playerstats = await dataHandler.parseStats(apiURL);
 
-        //TODO move to end
-        playerstats.forEach(function (playerStat) {
-            f.Debug.info(playerStat.name + ": " + playerStat.score);
-        })
     }
+
 
     function initializeCollisionGroups() {
         // ground

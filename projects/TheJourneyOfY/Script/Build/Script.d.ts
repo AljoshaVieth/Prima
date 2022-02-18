@@ -17,6 +17,7 @@ declare namespace TheJourneyOfY {
     class DataHandler {
         loadJson(path: string): Promise<any>;
         parseStats(apiUrl: string): Promise<PlayerStat[]>;
+        submitScore(apiUrl: string, score: number, name: string): Promise<void>;
     }
 }
 declare namespace TheJourneyOfY {
@@ -43,6 +44,7 @@ declare namespace TheJourneyOfY {
     import f = FudgeCore;
     let player: Player;
     let jumpSound: f.Node;
+    function populateScoreTable(_playerStats: PlayerStat[]): void;
 }
 declare namespace TheJourneyOfY {
     import f = FudgeCore;
@@ -55,5 +57,16 @@ declare namespace TheJourneyOfY {
         private initiatePositionAndScale;
         private update;
         private handlePlayerMovement;
+    }
+}
+declare namespace TheJourneyOfY {
+    import f = FudgeCore;
+    class GameState extends f.Mutable {
+        private static controller;
+        private static instance;
+        time: number;
+        private constructor();
+        static get(): GameState;
+        protected reduceMutator(_mutator: f.Mutator): void;
     }
 }

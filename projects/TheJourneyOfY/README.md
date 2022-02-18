@@ -1,3 +1,8 @@
+# The Journey of Y
+# [▶ PLAY NOW](https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/index.html)
+
+## Api
+There is also an api to store score data in a database. See [TheJourneyOfYStats](https://github.com/AljoshaVieth/Prima/tree/main/projects/TheJourneyOfYStats)
 ## Checklist for the final assignment
 © Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl, HFU
 (see [original source](https://github.com/JirkaDellOro/Prima/tree/f46e313f9068cbb88995b2c279d2f5296488def5))

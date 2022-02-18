@@ -55,12 +55,25 @@ var TheJourneyOfY;
             }
         }
         async parseStats(apiUrl) {
+            console.log("parsing stats");
             let stats = await this.loadJson(apiUrl + "?mode=get");
             let playerStats = [];
             for (let i = 0; i < stats.length; i++) {
                 playerStats[i] = stats[i];
             }
+            TheJourneyOfY.populateScoreTable(playerStats);
             return playerStats;
+        }
+        async submitScore(apiUrl, score, name) {
+            console.log("Submitting score: name=" + name + " score=" + score + " url=" + apiUrl + "?mode=insert");
+            let formData = new FormData();
+            formData.append('name', name);
+            formData.append('score', score.toString());
+            await fetch(apiUrl + "?mode=insert", {
+                method: 'POST',
+                body: formData,
+                headers: { 'Content-Type': 'application/form-data; charset=UTF-8' }
+            });
         }
     }
     TheJourneyOfY.DataHandler = DataHandler;
@@ -185,13 +198,25 @@ var TheJourneyOfY;
     let apiURL;
     let dataHandler;
     let playerstats;
+    let gameStarted;
+    let startTime;
+    let timePassed;
     let swoshSound;
     let victorySound;
     let defeatSound;
     let music;
     let activatePhysics = true;
     let body;
+    let reloadButton;
+    let gameOverScreen;
+    let scoreTable;
+    let yourScoreText;
+    let submitScoreScreen;
+    let submitScoreButton;
+    let gameOverText;
+    let playerName;
     async function start(_event) {
+        startTime = new Date().getTime();
         console.log("setting up...");
         await FudgeCore.Project.loadResourcesFromHTML();
         graph = f.Project.resources[graphId];
@@ -224,6 +249,19 @@ var TheJourneyOfY;
         // draw viewport once for immediate feedback
         //viewport.draw();
         body = document.getElementsByTagName('body')[0];
+        gameOverScreen = document.getElementById('GameOver');
+        reloadButton = document.getElementById("reload");
+        submitScoreButton = document.getElementById("submitscoreButton");
+        yourScoreText = document.getElementById("yourscore");
+        submitScoreScreen = document.getElementById("SubmitScore");
+        gameOverText = document.getElementById("GameOverText");
+        playerName = document.getElementById("playername");
+        reloadButton.addEventListener("click", function () {
+            window.location.reload();
+        });
+        submitScoreButton.addEventListener("click", function () {
+            dataHandler.submitScore(apiURL, timePassed, playerName.value);
+        });
         console.log("Starting...");
         //viewport = _event.detail;
         //graph = viewport.getBranch();
@@ -280,32 +318,49 @@ var TheJourneyOfY;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         initializeCollisionGroups();
         music.getComponents(f.ComponentAudio)[0].play(true);
+        gameStarted = true;
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        if (activatePhysics && currentZoomLevel == desiredZoomLevel) {
-            f.Physics.world.simulate(); // if physics is included and used
+        if (gameStarted) {
+            if (activatePhysics && currentZoomLevel == desiredZoomLevel) {
+                f.Physics.world.simulate(); // if physics is included and used
+            }
+            viewport.draw();
+            //zoom in
+            if (currentZoomLevel < desiredZoomLevel) {
+                currentZoomLevel++;
+                cmpCamera.mtxPivot.translateZ(1);
+            }
+            timePassed = (new Date().getTime() - startTime) / 1000;
+            TheJourneyOfY.GameState.get().time = timePassed;
+            f.AudioManager.default.update();
         }
-        viewport.draw();
-        //zoom in
-        if (currentZoomLevel < desiredZoomLevel) {
-            currentZoomLevel++;
-            cmpCamera.mtxPivot.translateZ(1);
-        }
-        f.AudioManager.default.update();
-        //victorySound.getComponents(f.ComponentAudio)[0].play(true);
     }
     function onGameOverHandler(_event) {
-        f.Debug.info("GAMEOVEREVENT TRIGGERED!!!!");
-        if (_event.gameWon) {
-            f.Debug.info("YOU WON!!!!");
-            victorySound.getComponents(f.ComponentAudio)[0].play(true);
+        if (gameStarted) {
+            if (_event.gameWon) {
+                victorySound.getComponents(f.ComponentAudio)[0].play(true);
+                submitScoreScreen.style.visibility = "visible";
+                yourScoreText.style.visibility = "visible";
+                gameOverText.textContent = "WELL DONE";
+            }
+            else {
+                defeatSound.getComponents(f.ComponentAudio)[0].play(true);
+            }
+            stopGame();
         }
-        else {
-            f.Debug.info("YOU LOST!");
-            defeatSound.getComponents(f.ComponentAudio)[0].play(true);
-        }
+    }
+    function stopGame() {
+        music.getComponents(f.ComponentAudio)[0].play(false);
+        swoshSound.getComponents(f.ComponentAudio)[0].play(false);
+        TheJourneyOfY.jumpSound.getComponents(f.ComponentAudio)[0].play(false);
+        gameOverScreen.style.visibility = "visible";
+        yourScoreText.textContent = "Your time: " + timePassed;
+        f.Debug.info("stopped");
+        gameStarted = false;
         f.Loop.stop();
+        f.Loop.removeEventListener("loopFrame" /* LOOP_FRAME */, update);
     }
     function mouseHoverHandler(_event) {
         let ray = viewport.getRayFromClient(new f.Vector2(_event.clientX, _event.clientY));
@@ -328,23 +383,6 @@ var TheJourneyOfY;
                 }
             }
         }
-        else {
-            /*
-            for (let borderObject of borderObjects.getIterator()) {
-                if (borderObject.name == "MovementBorder") {
-                    continue; //ignoring parent object since it is not relevant and causes problems otherwise
-                }
-                let componentMesh: f.ComponentMesh = borderObject.getComponent(f.ComponentMesh);
-                let position: f.Vector3 = componentMesh ? componentMesh.mtxWorld.translation : borderObject.mtxWorld.translation;
-                if (ray.getDistance(position).magnitude < borderObject.radius) {
-                    f.Debug.info("Hovering over " + borderObject.name + "! releasing object...");
-                    releaseObject();
-                    break; //ignoring other controllable objects. There can only be one.
-                }
-            }
-
-             */
-        }
     }
     function mouseDownHandler(_event) {
         if (hoveringOverControllableObject) {
@@ -353,12 +391,6 @@ var TheJourneyOfY;
             body.classList.add("grayscale"); //add the class
             objectSelected = true;
             controlledObject = hoveredObject;
-            /*
-            // not needed anymore cause physics gets disabled completely
-            controlledObject.getComponent(f.ComponentRigidbody).effectGravity = 0;
-            //stopping rotation
-            controlledObject.getComponent(f.ComponentRigidbody).effectRotation = new f.Vector3(0, 0, 0);
-             */
         }
     }
     function mouseUpHandler(_event) {
@@ -389,6 +421,14 @@ var TheJourneyOfY;
         hoveredObject = null;
         controlledObject = null;
     }
+    function populateScoreTable(_playerStats) {
+        scoreTable = document.getElementById("scoretable");
+        _playerStats.forEach(function (playerStat) {
+            let row = scoreTable.insertRow();
+            row.textContent = playerStat.name + ": " + playerStat.score;
+        });
+    }
+    TheJourneyOfY.populateScoreTable = populateScoreTable;
     async function setup() {
         canvas = document.querySelector("canvas");
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
@@ -397,10 +437,6 @@ var TheJourneyOfY;
         apiURL = config.apiURL;
         f.Debug.info("apiURL: " + apiURL);
         playerstats = await dataHandler.parseStats(apiURL);
-        //TODO move to end
-        playerstats.forEach(function (playerStat) {
-            f.Debug.info(playerStat.name + ": " + playerStat.score);
-        });
     }
     function initializeCollisionGroups() {
         // ground
@@ -512,5 +548,27 @@ var TheJourneyOfY;
         }
     }
     TheJourneyOfY.Player = Player;
+})(TheJourneyOfY || (TheJourneyOfY = {}));
+var TheJourneyOfY;
+(function (TheJourneyOfY) {
+    var f = FudgeCore;
+    var fui = FudgeUserInterface;
+    class GameState extends f.Mutable {
+        static controller;
+        static instance;
+        time = 10;
+        constructor() {
+            super();
+            let domHud = document.querySelector("#Hud");
+            GameState.instance = this;
+            GameState.controller = new fui.Controller(this, domHud);
+            console.log("Hud-Controller", GameState.controller);
+        }
+        static get() {
+            return GameState.instance || new GameState();
+        }
+        reduceMutator(_mutator) { }
+    }
+    TheJourneyOfY.GameState = GameState;
 })(TheJourneyOfY || (TheJourneyOfY = {}));
 //# sourceMappingURL=Script.js.map
