@@ -2,6 +2,7 @@
 🎓 This repo contains the assignments of the course Prototyping interaktiver Medien-Apps und Games at Furtwangen University
 
 # Final assignment: The Journey of Y
+![image](https://user-images.githubusercontent.com/12802765/154739421-f9a0a056-70c9-492e-b56c-8eb0528cf453.png)
 
 For credits etc. please see [here](https://github.com/AljoshaVieth/Prima/tree/main/projects/TheJourneyOfY)
 - Title:  The Journey of Y
@@ -10,10 +11,10 @@ For credits etc. please see [here](https://github.com/AljoshaVieth/Prima/tree/ma
 - Curriculum and semester: MIB 7
 - Course this development was created in (PRIMA): PRIMA
 - Docent: Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl
-- Link to the finished and executable application on Github-Pages: https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/index.html
+- Link to the finished and executable application on Github-Pages: https://aljoshavieth.github.io/Prima/projects/TheJourneyOfY/index.html (sometimes loads slowly)
 - Link to the source code: https://github.com/AljoshaVieth/Prima/tree/main/projects/TheJourneyOfY + https://github.com/AljoshaVieth/Prima/tree/main/projects/TheJourneyOfYStats
-- Link to the design document: 
-- Description for users on how to interact: Move right and left with arrow-keys or A and D. Jumpt with space. Drag objects per mous (hover->click->drag->drop). Goal is to hit the floating sphere at the far right handside with your player.
+- Link to the design document: https://github.com/AljoshaVieth/Prima/blob/main/TheYourneyOfY.pdf
+- Description for users on how to interact: Move right and left with arrow-keys or A and D. Jump with space. Drag objects per mouse (hover->click->drag->drop). Goal is to hit the floating sphere at the far right handside with your player.
 - Description on how to install, if applicable (additional services, database etc.): Place the stat.php on an addressable server supporting php. Create a MySQL like database with structure as below and alter credentials in stat.php to fit your case (line 10): 
 ![image](https://user-images.githubusercontent.com/12802765/154732944-c1e76fe6-d431-435f-affe-26762fcfbda5.png)
 
