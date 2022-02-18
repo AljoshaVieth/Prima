@@ -2,6 +2,7 @@
 🎓 This repo contains the assignments of the course Prototyping interaktiver Medien-Apps und Games at Furtwangen University
 
 # Final assignment: The Journey of Y
+![image](https://user-images.githubusercontent.com/12802765/154739421-f9a0a056-70c9-492e-b56c-8eb0528cf453.png)
 
 For credits etc. please see [here](https://github.com/AljoshaVieth/Prima/tree/main/projects/TheJourneyOfY)
 - Title:  The Journey of Y
