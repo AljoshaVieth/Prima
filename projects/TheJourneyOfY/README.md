@@ -19,8 +19,8 @@
 |   C | State Machines      | There are no enemies.                                                                                                                                                                                                                                                     |
 |   D | Animation           | The GoalObject is animated using the animation system of FudgeCore.                                                                                                                                                                                                       |
 
-
-## Sounds
+## Credit
+### Sounds
 | Sound                                    | Credit                                                                                                                                                                                   |
 |------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Swosh sound (when controlling an object) | [swosh.wav](https://freesound.org/people/AudioPapkin/sounds/444644/) by user AudioPapkin on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/). |
@@ -29,3 +29,5 @@
 | Defeat                                   | [defeat.wav](https://freesound.org/people/Kubatko/sounds/196584/) by user Kubatko on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).        |
 | Ambient music                            | [music.wav](https://freesound.org/people/ShortRecord/sounds/522589/) by user ShortRecord on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/). |
 
+### Textures
+Generated with [LowPoly Generator](https://cojdev.github.io/lowpoly/). Some are based on free to use images from [Unsplash](https://unsplash.com) and [Poly Haven](https://polyhaven.com). 
