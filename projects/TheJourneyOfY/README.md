@@ -1,30 +1,26 @@
-## Checklist
-
 ## Checklist for the final assignment
 © Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl, HFU
-| Nr | Criterion       | Explanation                                                                                                              |
-|---:|-------------------|---------------------------------------------------------------------------------------------------------------------|
-|  0 | Units and Positions | Where is 0, what is 1? Explain your setup of coordinate systems of the entities.                                    |
-|  1 | Hierarchy         | Explain the setup of the graphs and the advantages you gain by it.                                                  |
-|  2 | Editor            | Use the visual editor and explain which parts are better done by coding and why.                                    |
-|  3 | Scriptcomponents  | Use scriptcomponents and explain if they were useful in your context or not and why.                                |
-|  4 | Extend            | Derive classes from FudgeCore and explain if that was useful in your context or not and why.                        |
-|  5 | Sound             | Use sounds and explain your choice of sounds and placement in respect to the user's perception.                     |
-|  6 | VUI               | Create a virtual user interface using the interface controller and mutables. Explain the interface.                 |
-|  7 | Event-System      | Use the event system to send messages through graphs and explain if that was useful in your context or not and why. |
-|  8 | External Data     | Create a configuration file your application loads and adjusts to the content. Explain your choice of parameters.   |
-|  9 | Light             | Explain your choice of lights in your graphs.                                                                       |
-|  A | Physics           | Add rigidbody components and work with collisions (1) and/or forces and torques (1) and/or joints (1)               |
-|  B | Net               | Add multiplayer functionality via network (3)                                                                       |
-|  C | State Machines    | Create autonomous entities using the StateMachine (1) and/or ComponentStateMachine (1) defined in FudgeAid          |
-|  D | Animation         | Animate using the animation system of FudgeCore (1) and/or Sprites (1) as defined in FudgeAid                           |
+(see [original source](https://github.com/JirkaDellOro/Prima/tree/f46e313f9068cbb88995b2c279d2f5296488def5))
+
+|  Nr | Criterion           | Explanation                                                                                                                                                                                                                                                               |
+|----:|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|   0 | Units and Positions | Where is 0, what is 1? Explain your setup of coordinate systems of the entities.                                                                                                                                                                                          |
+|   1 | Hierarchy           | The hierarchy of the scene enables looping through specific "groups" of objects, such as controllables or the ground. It is used to set the collission groups in the main.                                                                                                |
+|   2 | Editor              | The visual editor was used to generate almost all objects. It is extremely helpful because what you see is what you get which is a helpful speed advantage. The Player was not created in the editor, however it would also be possible, it´s just a personal preference. |
+|   3 | Scriptcomponents    | Scriptcomponents are used to add an animation to the goalObject as well as handling camera Movement. They are very helpful.                                                                                                                                               |
+|   4 | Extend              | The Player extends FudgeCore.node. Although it is not really necessary. There is also a custom Event which extends CustomEvent                                                                                                                                            |
+|   5 | Sound               | Sounds are used for actions such as jumping, winning, loosing, dragging objects. There also is some music.                                                                                                                                                                |
+|   6 | VUI                 | Create a virtual user interface using the interface controller and mutables. Explain the interface.                                                                                                                                                                       |
+|   7 | Event-System        | The event system is used to determine if the game is over. It is really helpful because it enables passing the Information from the Player class or the GoalScript to the main class without any big effort.                                                              |
+|   8 | External Data       | The config contains a url to the api which holds the records.                                                                                                                                                                                                             |
+|   9 | Light               | Since it´s mainly a 2D game, light isn´t necessary.                                                                                                                                                                                                                       |
+|   A | Physics             | Almost all elements have rigidbodys which are used to determine collisions. Forces are used to control the Player (move + jump)                                                                                                                                           |
+|   B | Net                 | It´s a singleplayer game with online statistics, so no multiplayer here, just asynchronous competition based on score.                                                                                                                                                    |
+|   C | State Machines      | There are no enemies.                                                                                                                                                                                                                                                     |
+|   D | Animation           | The GoalObject is animated using the animation system of FudgeCore.                                                                                                                                                                                                       |
 
 
 ## Credit
-### Textures
-- [Aerial Rocks 01](https://polyhaven.com/a/aerial_rocks_01) by user Rob Tuytel on polyhaven.com, licensed under the [CC0](https://polyhaven.com/license).
-- [ Castle Wall Variation](https://polyhaven.com/a/castle_wall_varriation) by user Rob Tuytel on polyhaven.com, licensed under the [CC0](https://polyhaven.com/license).
-
 ### Sounds
 #### Swosh sound (when controlling an object)
 - [Swoosh 29.wav](https://freesound.org/people/AudioPapkin/sounds/444644/) by user AudioPapkin on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
