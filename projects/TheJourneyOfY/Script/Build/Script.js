@@ -55,7 +55,6 @@ var TheJourneyOfY;
             }
         }
         async parseStats(apiUrl) {
-            console.log("parsing stats");
             let stats = await this.loadJson(apiUrl + "?mode=get");
             let playerStats = [];
             for (let i = 0; i < stats.length; i++) {
@@ -312,7 +311,7 @@ var TheJourneyOfY;
         viewport.getCanvas().addEventListener("mousemove", mouseMoveHandler);
         viewport.getCanvas().addEventListener("mouseup", mouseUpHandler);
         viewport.getCanvas().addEventListener("wheel", scrollHandler);
-        viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
+        //viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         initializeCollisionGroups();
         if (playMusic) {

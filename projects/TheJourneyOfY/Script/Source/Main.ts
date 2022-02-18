@@ -111,6 +111,7 @@ namespace TheJourneyOfY {
 
         submitScoreButton.addEventListener("click", function () {
             dataHandler.submitScore(apiURL, timePassed, playerName.value);
+
         });
         console.log("Starting...");
         //viewport = _event.detail;
@@ -185,7 +186,7 @@ namespace TheJourneyOfY {
         viewport.getCanvas().addEventListener("wheel", scrollHandler);
 
 
-        viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
+        //viewport.physicsDebugMode = f.PHYSICS_DEBUGMODE.COLLIDERS;
 
         f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         initializeCollisionGroups();
