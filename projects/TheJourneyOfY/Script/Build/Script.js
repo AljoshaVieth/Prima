@@ -258,6 +258,7 @@ var TheJourneyOfY;
         });
         submitScoreButton.addEventListener("click", function () {
             dataHandler.submitScore(apiURL, timePassed, playerName.value);
+            window.location.reload();
         });
         console.log("Starting...");
         //viewport = _event.detail;
@@ -424,7 +425,7 @@ var TheJourneyOfY;
         scoreTable = document.getElementById("scoretable");
         _playerStats.forEach(function (playerStat) {
             let row = scoreTable.insertRow();
-            let formattedScore = [playerStat.score.toString().slice(0, 2), ",", playerStat.score.toString().slice(2)].join('');
+            let formattedScore = [playerStat.score.toString().slice(0, playerStat.score.toString().length - 2), ",", playerStat.score.toString().slice(playerStat.score.toString().length - 2)].join('');
             row.textContent = playerStat.name + ": " + formattedScore;
         });
     }
