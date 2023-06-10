@@ -35,4 +35,13 @@ There is also an api to store score data in a database. See [TheJourneyOfYStats]
 | Ambient music                            | [music.wav](https://freesound.org/people/ShortRecord/sounds/522589/) by user ShortRecord on freesound.org, licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/). |
 
 ### Textures
-Generated with [LowPoly Generator](https://cojdev.github.io/lowpoly/). Some are based on free to use images from [Unsplash](https://unsplash.com) and [Poly Haven](https://polyhaven.com). 
+Generated with [LowPoly Generator](https://cojdev.github.io/lowpoly/). Some are self-made, some are based on free to use images from [Unsplash](https://unsplash.com) and [Poly Haven](https://polyhaven.com). 
+
+Used base images:
+
+| Usage ingame                                    | Credit to base image                                                                                                                                                                                  |
+|------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Backgroundimage | [mountain top under sunset](https://unsplash.com/photos/8uXthE3xeBI) by user Damian Markutt on unsplash.com, licensed under the [Unsplash License](https://unsplash.com/license)|
+| Ground and non-movable obstacles| [grayscale photo of stone](https://unsplash.com/photos/gPm8h3DS1s4) by user Nick Nice on unsplash.com, licensed under the [Unsplash License](https://unsplash.com/license)|
+| Lava |  [red and white abstract painting](https://unsplash.com/photos/IdXJIxj6VfU) by user Alex Sherstnev on unsplash.com, licensed under the [Unsplash License](https://unsplash.com/license)|
+| Movable obstacles | [Castle Wall Slates](https://polyhaven.com/a/castle_wall_slates) by user Rob Tuytel on polyhaven.com, licensed under the [CC0](https://polyhaven.com/license)|

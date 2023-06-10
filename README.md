@@ -44,3 +44,13 @@ A copy of the catalogue of criteria above, the right column replaced with very b
 |   D | Animation           | The GoalObject is animated using the animation system of FudgeCore.                                                                                                                                                                                                       |
 
 
+## GameZone
+- Screenshots can be found [here](https://github.com/AljoshaVieth/Prima/tree/main/projects/TheJourneyOfY/Screenshots)
+- Genre: Jump ’n’ Run
+- Tags: FUDGE, PRIMA
+- Subtitel: Be the fastest to reach the floating goal!
+- Short instructions (max 250 characters) on how to play:
+  Move your character with [A] and [D] or the arrow keys. Jump with [SPACE]. Drag and drop Objects with your mouse (rotate them with your mouse-wheel).
+
+- A declaration of consent with the display of the application in the GameZone with an explicit reference to the author: Hiermit stimme ich zu, dass diese Applikation in der GameZone mit Namensnennung ausgestellt wird.
+
